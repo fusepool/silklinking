@@ -1,0 +1,60 @@
+<Silk>
+	<Prefixes>
+		<Prefix namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+			id="rdf"></Prefix>
+		<Prefix namespace="http://www.w3.org/2002/07/owl#" id="owl"></Prefix>
+		<Prefix namespace="http://xmlns.com/foaf/0.1/" id="foaf"></Prefix>
+		<Prefix namespace="http://www.w3.org/2000/01/rdf-schema#" id="rdfs"></Prefix>
+		<Prefix namespace="http://www.w3.org/2006/vcard/ns#" id="vcard"></Prefix>
+	</Prefixes>
+	<DataSources>
+		<DataSource type="file" id="local_foaf">
+			<Param name="file" value="/eclipse/workspaces/sem-web/silk.bundle.client/data/luigi_foaf.rdf"></Param>
+			<Param name="format" value="RDF/XML"></Param>
+		</DataSource>
+		<DataSource type="file" id="local_vcard">
+			<Param name="file" value="/eclipse/workspaces/sem-web/silk.bundle.client/data/data/luigi_vcard.rdf"></Param>
+			<Param name="format" value="RDF/XML"></Param>
+		</DataSource>
+	</DataSources>
+	<Interlinks>
+		<Interlink id="foaf_vcard">
+			<LinkType>owl:sameAs</LinkType>
+			<SourceDataset dataSource="local_foaf" var="a">
+				<RestrictTo> ?a
+					&lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt;
+					&lt;http://xmlns.com/foaf/0.1/Person&gt; . </RestrictTo>
+			</SourceDataset>
+			<TargetDataset dataSource="local_vcard" var="b">
+				<RestrictTo> ?b
+					&lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt;
+					&lt;http://www.w3.org/2006/vcard/ns#Person&gt; . </RestrictTo>
+			</TargetDataset>
+			<LinkageRule>
+				<Aggregate weight="1" type="max" required="false" id="unnamed_4">
+					<Compare weight="1" threshold="1.0" required="false"
+						metric="equality" id="foaf_name_vcard_fn_cmp">
+						<Input path="?a/foaf:name" id="unnamed_1"></Input>
+						<Input path="?b/vcard:fn" id="unnamed_2"></Input>
+					</Compare>
+				</Aggregate>
+			</LinkageRule>
+			<Filter></Filter>
+			<Outputs>
+			 
+				<Output type="file" minConfidence="0.95">
+					<Param name="file"
+						value="/eclipse/workspaces/sem-web/silk.bundle.client/output/luigi-accepted_links.nt" />
+					<Param name="format" value="ntriples" />
+				</Output>
+			<!--  
+				<Output type="sparul">
+					<Param name="uri" value="http://localhost/jdocs" />
+					<Param name="uri" value="http://cabernet:8080/silk-sparql/sparql" />
+					<Param name="parameter" value="query" />
+				</Output>
+			-->
+			</Outputs>
+		</Interlink>
+	</Interlinks>
+</Silk>
