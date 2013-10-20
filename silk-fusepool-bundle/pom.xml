@@ -1,15 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>eu.fusepool</groupId>
-    <artifactId>silklinking</artifactId>
-    <version>0.7.0</version>
+    <groupId>eu.fusepool.platform</groupId>
+    <artifactId>enhancement.engine.interlinking.silk</artifactId>
+    <version>0.1.0</version>
   </parent>
-  <artifactId>silk-fusepool-bundle</artifactId>
+
+  <artifactId>enhancement.engine.interlinking.silk.bundle</artifactId>
+  <version>0.1.0</version>
 
   <packaging>bundle</packaging>
-  
-  
+    
   	<build>
 		<plugins>
 			<plugin>
@@ -50,6 +51,7 @@
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-scr-plugin</artifactId>
+                                <version>1.9.0</version>
 			</plugin>
 			<!-- <plugin> <artifactId>maven-source-plugin</artifactId> <version>2.1.2</version> 
 				<executions> <execution> <id>attach-sources</id> <goals> <goal>jar</goal> 
@@ -60,7 +62,7 @@
   
   
   
-  <dependencies>
+        <dependencies>
   		
 		<dependency>
 			<groupId>eu.fusepool</groupId>
@@ -76,7 +78,7 @@
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.scr.annotations</artifactId>
-			<scope>provided</scope>
+                        <version>1.7.0</version>
 		</dependency>
 
 		<dependency>
