@@ -27,7 +27,7 @@ public class SilkClientActivator implements BundleActivator {
 		SilkClientImpl client = new SilkClientImpl() ;
 		ctx.registerService(SilkClient.class.getName(), client , null) ;
 		client.setCtx(context) ;
-		client.excute() ; 
+		//client.excute() ; 
 		
 
 	}
