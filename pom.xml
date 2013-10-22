@@ -1,15 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-       <groupId>eu.fusepool.platform</groupId>
-	<artifactId>enhancement.engine.interlinking.silk</artifactId>
-	<version>0.1.0</version>
+	<groupId>eu.fusepool</groupId>
+	<artifactId>silklinking</artifactId>
+	<version>0.7.0</version>
 	<packaging>pom</packaging>
-	<name>Fusepool Enhancement Engine Silk Interlinking</name>
-        <description>The interlinking module is implemented as an enhancer that receives a content-item with a metadata object containing RDF data 
-                     then connects itself to the Apache Stanbol’s SPARQL endpoint and creates links between entities in the content item metadata 
-                     and the platform Entityhub. 
-         </description>
+	<name>Fusepool-silk integration</name>
 
 
 	<developers>
