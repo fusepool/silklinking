@@ -34,7 +34,7 @@ public class SilkClientImpl implements SilkClient {
 	 * @see eu.fusepool.java.silk.client.SilkClient#excute()
 	 */
 	@Override
-	public void excute() throws Exception {
+	public void excute() {
 		InputStream configStream = SilkClientImpl.class.getResourceAsStream("/config/silk-bundle-config2.xml") ;
 		Silk.executeStream(configStream, null, 1, true) ;
 		/*
@@ -52,7 +52,7 @@ public class SilkClientImpl implements SilkClient {
 	 */
 	@Override
 	public void executeStream(InputStream config, String linkSpecId,
-			int numThreads, boolean reload) throws Exception {
+			int numThreads, boolean reload)  {
 		Silk.executeStream(config, linkSpecId, numThreads, reload) ;
 	}
 
@@ -61,7 +61,7 @@ public class SilkClientImpl implements SilkClient {
 	 */
 	@Override
 	public void executeFile(File config, String linkSpecId, int numThreads,
-			boolean reload) throws Exception {
+			boolean reload) {
 		Silk.executeFile(config, linkSpecId, numThreads, reload) ;
 	}
 
@@ -78,12 +78,8 @@ public class SilkClientImpl implements SilkClient {
 	   @Activate
 	   protected void activate(final ComponentContext componentContext) {
 		   this.componentContext = componentContext ;
-		   try {
-			this.excute() ;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		   this.excute() ;
+	
 	   }
 	
 
