@@ -14,7 +14,6 @@
 		</developer>
 	</developers>
 
-	<inceptionYear>2013</inceptionYear>
 
 	<properties>
 		<silk.integration.version>0.7.0</silk.integration.version>
