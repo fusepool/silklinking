@@ -20,7 +20,7 @@ package eu.fusepool.java.silk.client;
  *
  * @author luigi
  */
-class SilkException extends Exception {
+public class SilkException extends Exception {
 
     public SilkException() {
     }
