@@ -24,7 +24,6 @@
 
 
 	<properties>
-		<silk.integration.version>0.7.0</silk.integration.version>
 		<jersey-version>1.15</jersey-version>
 		<owlapi-version>3.3</owlapi-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
