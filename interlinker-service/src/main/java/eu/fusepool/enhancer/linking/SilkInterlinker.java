@@ -45,12 +45,12 @@ policy = ConfigurationPolicy.OPTIONAL)
 // create a default instance with the default configuration
 @Service
 @Properties(value = {
-		@Property(name = Constants.SERVICE_RANKING, intValue = PatentLinkingService.DEFAULT_SERVICE_RANKING),
-		@Property(name = PatentLinkingService.SPARQL_ENDPOINT_LABEL, value = "", description = "SPARQL endpoint of the target (master) repository") })
-public class PatentLinkingService implements Interlinker {
+		@Property(name = Constants.SERVICE_RANKING, intValue = SilkInterlinker.DEFAULT_SERVICE_RANKING),
+		@Property(name = SilkInterlinker.SPARQL_ENDPOINT_LABEL, value = SilkInterlinker.DEFAULT_SPARQL_ENDPOINT, description = "SPARQL endpoint of the target (master) repository") })
+public class SilkInterlinker implements Interlinker {
 
 	private static Logger logger = LoggerFactory
-			.getLogger(PatentLinkingService.class);
+			.getLogger(SilkInterlinker.class);
 
 	/**
 	 * Default value for the {@link Constants#SERVICE_RANKING} used by this
@@ -83,7 +83,7 @@ public class PatentLinkingService implements Interlinker {
 
 		@SuppressWarnings("rawtypes")
 		Dictionary dict = ce.getProperties();
-		Object o = dict.get(PatentLinkingService.SPARQL_ENDPOINT_LABEL);
+		Object o = dict.get(SilkInterlinker.SPARQL_ENDPOINT_LABEL);
 		if (o != null && !"".equals(o.toString())) {
 			sparqlEndpoint = (String) o;
 		}
