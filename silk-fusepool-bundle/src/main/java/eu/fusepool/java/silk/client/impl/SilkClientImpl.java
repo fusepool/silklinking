@@ -78,7 +78,7 @@ public class SilkClientImpl implements SilkClient {
 	   @Activate
 	   protected void activate(final ComponentContext componentContext) {
 		   this.componentContext = componentContext ;
-		   this.excute() ;
+		   //this.excute() ;
 	
 	   }
 	
