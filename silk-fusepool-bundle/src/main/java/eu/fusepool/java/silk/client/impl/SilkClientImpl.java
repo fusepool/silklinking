@@ -23,7 +23,7 @@ import eu.fusepool.scala.silk.Silk;
  *
  */
 @Component(immediate = true, metatype = true)
-@Service
+@Service(SilkClient.class)
 public class SilkClientImpl implements SilkClient {
 
 	protected BundleContext ctx ;
