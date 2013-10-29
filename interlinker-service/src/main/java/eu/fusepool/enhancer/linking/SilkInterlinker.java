@@ -200,7 +200,7 @@ public class SilkInterlinker implements Interlinker {
          */
         private void buildConfig() throws IOException {
             InputStream cfgIs = this.getClass().getResourceAsStream(
-                    "/config/silk-bundle-config2.xml");
+                    "silk-config-applicants-test.xml");
             String roughConfig = IOUtils.toString(cfgIs, "UTF-8");
             roughConfig = StringUtils.replace(roughConfig, SPARQL_ENDPOINT_01_TAG,
                     sparqlEndpoint);
