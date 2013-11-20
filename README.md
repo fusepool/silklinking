@@ -2,8 +2,7 @@ Silk Interlinking Service
 ===========
 
 This project wraps the SILK Link Discovery Framework to provide OSGi components an RDF to RDF interlinking service. 
-This component provides a service for the Silk Linking Engine component so this must be previously installed in the 
-OSGi environment. To compile the bundle run the command
+To compile the bundle run the command
 
     mvn install
 
@@ -22,10 +21,8 @@ provides an implementation of the Interlinker interface to make the interlinking
 interlinking service, available to other components. It lies in between silk-fusepool-bundle component and any other 
 component that needs an interlinking service. The silk-fusepool-bundle component must be installed in the OSGi framework 
 from the silk-fusepool-bundle/target folder. The interlinker-service component must be installed from interlinker-service/target 
-folder. In order to make the interlinker service deployable in the OSGi environment the datalifecycle component must also 
-be installed as currently the Interlinker interface is included in its source code. The datalifecycle component is an application 
-that uses the interlinking service provided by silk-fusepool-bundle component through the interlinker-service component. 
-The silk-fusepool-bundle can also be used directly, without using the Interlinker interface, by the silklinkingengine 
-bundle. See that project for more info.
+folder. The datalifecycle component is an application that uses the interlinking service implemented by silk-fusepool-bundle 
+component through the interlinker-service component. The silk-fusepool-bundle can also be used directly, without using the 
+Interlinker interface, by the silklinkingengine bundle. See that project for more info.
 
 
