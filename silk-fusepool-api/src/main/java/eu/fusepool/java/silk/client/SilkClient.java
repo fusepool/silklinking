@@ -25,11 +25,11 @@ import java.io.InputStream;
 public interface SilkClient {
 
     /**
-     * Executes loading a default configuration
+     * Starts a reconciliation/interlinking task. It uses rules from a default configuration file.
      *
      * @throws Exception
      */
-    void excute() throws SilkException;
+    void execute() throws SilkException;
 
     /**
      *
