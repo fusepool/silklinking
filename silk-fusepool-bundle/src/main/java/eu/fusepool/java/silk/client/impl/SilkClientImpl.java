@@ -33,8 +33,7 @@ public class SilkClientImpl implements SilkClient {
 	/* (non-Javadoc)
 	 * @see eu.fusepool.java.silk.client.SilkClient#excute()
 	 */
-	@Override
-	public void excute() {
+	public void execute() {
 		InputStream configStream = SilkClientImpl.class.getResourceAsStream("/config/silk-bundle-config2.xml") ;
 		Silk.executeStream(configStream, null, 1, true) ;
 		/*
@@ -50,7 +49,6 @@ public class SilkClientImpl implements SilkClient {
 	/* (non-Javadoc)
 	 * @see eu.fusepool.java.silk.client.SilkClient#executeStream(java.io.InputStream, java.lang.String, int, boolean)
 	 */
-	@Override
 	public void executeStream(InputStream config, String linkSpecId,
 			int numThreads, boolean reload)  {
 		Silk.executeStream(config, linkSpecId, numThreads, reload) ;
@@ -59,7 +57,6 @@ public class SilkClientImpl implements SilkClient {
 	/* (non-Javadoc)
 	 * @see eu.fusepool.java.silk.client.SilkClient#executeFile(java.io.File, java.lang.String, int, boolean)
 	 */
-	@Override
 	public void executeFile(File config, String linkSpecId, int numThreads,
 			boolean reload) {
 		Silk.executeFile(config, linkSpecId, numThreads, reload) ;
@@ -68,8 +65,7 @@ public class SilkClientImpl implements SilkClient {
 	/* (non-Javadoc)
 	 * @see eu.fusepool.java.silk.client.SilkClient#ExecuteConfig()
 	 */
-	//@Override
-	public void ExecuteConfig() throws Exception {
+	public void executeConfig() throws Exception {
 		// TODO Auto-generated method stub
 		throw new Exception("not implemented yet!") ;
 	}
@@ -90,7 +86,7 @@ public class SilkClientImpl implements SilkClient {
 		 */
 		public static void main(String[] args) throws Exception {
 			SilkClient client = new SilkClientImpl() ;
-			client.excute() ;
+			client.execute() ;
 
 		}
 
