@@ -51,14 +51,16 @@ import org.osgi.framework.ServiceReference;
         // instances
         policy = ConfigurationPolicy.OPTIONAL)
 // create a default instance with the default configuration
-@Service
+@Service(value=Interlinker.class)
 @Properties(value = {
-    @Property(name = Constants.SERVICE_RANKING, intValue = SilkInterlinker.DEFAULT_SERVICE_RANKING),
-    @Property(name = SilkInterlinker.SPARQL_ENDPOINT_LABEL, value = SilkInterlinker.DEFAULT_SPARQL_ENDPOINT, description = "SPARQL endpoint of the target (master) repository")})
+    @Property(name = Constants.SERVICE_RANKING, 
+    		intValue = SilkInterlinker.DEFAULT_SERVICE_RANKING),
+    @Property(name = SilkInterlinker.SPARQL_ENDPOINT_LABEL,
+    		value = SilkInterlinker.DEFAULT_SPARQL_ENDPOINT, 
+    		description = "SPARQL endpoint of the target (master) repository")})
 public class SilkInterlinker implements Interlinker {
 
-    private static Logger logger = LoggerFactory
-            .getLogger(SilkInterlinker.class);
+    private static Logger logger = LoggerFactory.getLogger(SilkInterlinker.class);
 
     @Reference
     private Parser parser;
@@ -103,18 +105,18 @@ public class SilkInterlinker implements Interlinker {
             sparqlEndpoint = (String) o;
         }
 
-        logger.info("The SilkLinkingService engine is being activated");
+        logger.info("The Silk Linking Service is being activated");
 
     }
 
     @Deactivate
     protected void deactivate(ComponentContext context) {
-        logger.info("The SilkLinkingService engine is being deactivated");
+        logger.info("The Silk Linking Service is being deactivated");
     }
 
     public TripleCollection interlink(TripleCollection dataToInterlink,
-            UriRef interlinkAgainst) {
-        SilkJob job = new SilkJob(bundleContext, sparqlEndpoint, interlinkAgainst);
+            UriRef targetGraphRef) {
+        SilkJob job = new SilkJob(bundleContext, sparqlEndpoint, targetGraphRef);
         return job.executeJob(dataToInterlink);
     }
 
@@ -142,10 +144,10 @@ public class SilkInterlinker implements Interlinker {
 
         String config;
 
-        public SilkJob(BundleContext ctx, String sparqlEndpoint, UriRef graphName) {
+        public SilkJob(BundleContext ctx, String sparqlEndpoint, UriRef targetGraphRef) {
             bundleContext = ctx;
             this.sparqlEndpoint = sparqlEndpoint;
-            this.sparqlGraph = graphName.getUnicodeString();
+            this.sparqlGraph = targetGraphRef.getUnicodeString();
             logger.info("silk job started");
         }
 
@@ -162,19 +164,18 @@ public class SilkInterlinker implements Interlinker {
                 rdfOS.close();
                 buildConfig();
 
-                silk.executeStream(IOUtils.toInputStream(config, "UTF-8"), null, 1,
-                        true);
+                silk.executeStream(IOUtils.toInputStream(config, "UTF-8"), null, 1, true);
 
-			// This graph will contain the results of the duplicate detection
+			    // This graph will contain the results of the duplicate detection
                 // i.e. owl:sameAs statements
                 MGraph owlSameAsStatements = new IndexedMGraph();
                 InputStream is = new FileInputStream(outputData);
-
                 Set<String> formats = parser.getSupportedFormats();
                 parser.parse(owlSameAsStatements, is, SupportedFormat.N_TRIPLE);
                 is.close();
-                logger.info(owlSameAsStatements.size()
-                        + " triples extracted by job: " + jobId);
+                
+                logger.info(owlSameAsStatements.size() + " triples extracted by job: " + jobId);
+                
                 return owlSameAsStatements;
 
             } catch (IOException e) {
@@ -199,27 +200,29 @@ public class SilkInterlinker implements Interlinker {
          * @throws IOException
          */
         private void buildConfig() throws IOException {
-            InputStream cfgIs = this.getClass().getResourceAsStream(
-                    "silk-config-applicants-test.xml");
+            InputStream cfgIs = this.getClass().getResourceAsStream("silk-config-applicants-test.xml");
             String roughConfig = IOUtils.toString(cfgIs, "UTF-8");
-            roughConfig = StringUtils.replace(roughConfig, SPARQL_ENDPOINT_01_TAG,
-                    sparqlEndpoint);
+            roughConfig = StringUtils.replace(roughConfig, SPARQL_ENDPOINT_01_TAG, sparqlEndpoint);
+            
             if (sparqlGraph != null && !"".equals(sparqlGraph)) {
-                String graphParamFragment = "<Param name=\"graph\" value=\""
+                /*
+            	String graphParamFragment = "<Param name=\"graph\" value=\""
                         + sparqlGraph + "\"" + "></Param>";
-                roughConfig = StringUtils.replace(roughConfig, SPARQL_GRAPH_01_TAG,
-                        graphParamFragment);
+                
+                roughConfig = StringUtils.replace(roughConfig, SPARQL_GRAPH_01_TAG, graphParamFragment);
+                */
+                roughConfig = StringUtils.replace(roughConfig, SPARQL_GRAPH_01_TAG, sparqlGraph);
+                
             } else {
                 roughConfig = StringUtils.replace(roughConfig, SPARQL_GRAPH_01_TAG,
                         "");
             }
-            roughConfig = StringUtils.replace(roughConfig, CI_METADATA_TAG,
-                    rdfData.getAbsolutePath());
-            config = StringUtils.replace(roughConfig, OUTPUT_TMP_TAG,
-                    outputData.getAbsolutePath());
-            // logger.info("configuration built for the job:" + jobId+"\n"+config) ;
-            System.out.println("configuration built for the job:" + jobId + "\n"
-                    + config);
+            
+            roughConfig = StringUtils.replace(roughConfig, CI_METADATA_TAG, rdfData.getAbsolutePath());
+            config = StringUtils.replace(roughConfig, OUTPUT_TMP_TAG, outputData.getAbsolutePath());
+            
+            logger.info("configuration built for the job:" + jobId+"\n"+config) ;
+            //System.out.println("configuration built for the job:" + jobId + "\n" + config);
         }
 
         /**
