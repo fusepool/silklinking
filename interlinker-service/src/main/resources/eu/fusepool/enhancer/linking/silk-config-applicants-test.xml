@@ -16,7 +16,7 @@
 		
 		<DataSource id="master" type="sparqlEndpoint">
 			<Param name="endpointURI" value="[SPARQL_ENDPOINT_01]" />
-			<Param name="graph" value="urn:x-localinstance:/content.graph" />
+			<Param name="graph" value="[GRAPH_PARAMETER]" />
 			<Param name="login" value="admin" />
 			<Param name="password" value="admin" />
 			<Param name="pageSize" value="50000" />
@@ -30,13 +30,13 @@
 			<LinkType>owl:sameAs</LinkType>
 			<SourceDataset dataSource="source" var="applicant_a">
 				<RestrictTo> 
- 				?applicant_a a foaf:Agent .
+ 				?applicant_a rdf:type foaf:Agent .
 				?patent pmo:applicant ?applicant_a .
 				</RestrictTo>
 			</SourceDataset>
 			<TargetDataset dataSource="master" var="applicant_b">
 				<RestrictTo>  
- 				?applicant_b a foaf:Agent .
+ 				?applicant_b rdf:type foaf:Agent .
 				?patent pmo:applicant ?applicant_b .
 				</RestrictTo>
 			</TargetDataset>
