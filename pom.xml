@@ -30,7 +30,7 @@
 		<solr-version>3.6.1</solr-version>
 		<gpg.useagent>true</gpg.useagent>
 		<freemarker-version>2.3.19</freemarker-version>
-		<silk.version>2.5.4</silk.version>
+		<silk.version>2.5.3</silk.version>
 		<scala.version>2.10.0</scala.version>
 	</properties>
 
@@ -40,7 +40,7 @@
 		<module>silk-wrapper</module>
 		<module>silk-fusepool-bundle</module>
 		<module>silk-fusepool-api</module>
-                <module>interlinker-service</module>
+        <module>interlinker-service</module>
 	</modules>
 
 
@@ -76,10 +76,7 @@
 				<artifactId>scala-library</artifactId>
 				<version>2.9.1</version>
 			</dependency>
-			<!-- <dependency> <groupId>org.scala-lang</groupId> <artifactId>scala-reflect</artifactId> 
-				<version>2.9.1</version> </dependency> -->
-			<!-- <dependency> <groupId>org.scala-lang</groupId> <artifactId>scala-library</artifactId> 
-				<version>2.9.1</version> </dependency> -->
+			
 			<dependency>
 				<groupId>de.fuberlin.wiwiss.silk</groupId>
 				<artifactId>silk-core</artifactId>
