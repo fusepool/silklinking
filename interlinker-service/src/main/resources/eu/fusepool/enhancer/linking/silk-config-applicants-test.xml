@@ -29,15 +29,15 @@
 		<Interlink id="applicants">
 			<LinkType>owl:sameAs</LinkType>
 			<SourceDataset dataSource="source" var="applicant_a">
-				<RestrictTo> 
+				<RestrictTo>				
  				?applicant_a rdf:type foaf:Agent .
-				?patent pmo:applicant ?applicant_a .
+				?patent pmo:applicant ?applicant_a .				
 				</RestrictTo>
 			</SourceDataset>
 			<TargetDataset dataSource="master" var="applicant_b">
-				<RestrictTo>  
+				<RestrictTo>				 
  				?applicant_b rdf:type foaf:Agent .
-				?patent pmo:applicant ?applicant_b .
+				?patent pmo:applicant ?applicant_b .				
 				</RestrictTo>
 			</TargetDataset>
 
