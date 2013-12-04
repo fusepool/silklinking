@@ -32,6 +32,7 @@ import java.io.OutputStream;
 import java.util.Set;
 import java.util.UUID;
 import org.apache.clerezza.rdf.core.MGraph;
+import org.apache.clerezza.rdf.core.impl.SimpleMGraph;
 import org.apache.clerezza.rdf.core.serializedform.Parser;
 import org.apache.clerezza.rdf.core.serializedform.Serializer;
 import org.apache.clerezza.rdf.core.serializedform.SerializingProvider;
@@ -147,7 +148,7 @@ public class SilkInterlinker implements Interlinker {
         public SilkJob(BundleContext ctx, String sparqlEndpoint, UriRef targetGraphRef) {
             bundleContext = ctx;
             this.sparqlEndpoint = sparqlEndpoint;
-            this.sparqlGraph = targetGraphRef.getUnicodeString();
+            this.sparqlGraph = "http://localhost:8080/graph?name=" + targetGraphRef.getUnicodeString();
             logger.info("silk job started");
         }
 
@@ -168,7 +169,7 @@ public class SilkInterlinker implements Interlinker {
 
 			    // This graph will contain the results of the duplicate detection
                 // i.e. owl:sameAs statements
-                MGraph owlSameAsStatements = new IndexedMGraph();
+                MGraph owlSameAsStatements = new SimpleMGraph();
                 InputStream is = new FileInputStream(outputData);
                 Set<String> formats = parser.getSupportedFormats();
                 parser.parse(owlSameAsStatements, is, SupportedFormat.N_TRIPLE);
@@ -214,8 +215,7 @@ public class SilkInterlinker implements Interlinker {
                 roughConfig = StringUtils.replace(roughConfig, SPARQL_GRAPH_01_TAG, sparqlGraph);
                 
             } else {
-                roughConfig = StringUtils.replace(roughConfig, SPARQL_GRAPH_01_TAG,
-                        "");
+                roughConfig = StringUtils.replace(roughConfig, SPARQL_GRAPH_01_TAG, "");
             }
             
             roughConfig = StringUtils.replace(roughConfig, CI_METADATA_TAG, rdfData.getAbsolutePath());
