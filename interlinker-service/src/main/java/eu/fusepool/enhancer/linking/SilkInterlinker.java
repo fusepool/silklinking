@@ -148,7 +148,7 @@ public class SilkInterlinker implements Interlinker {
         public SilkJob(BundleContext ctx, String sparqlEndpoint, UriRef targetGraphRef) {
             bundleContext = ctx;
             this.sparqlEndpoint = sparqlEndpoint;
-            this.sparqlGraph = "http://localhost:8080/graph?name=" + targetGraphRef.getUnicodeString();
+            this.sparqlGraph = targetGraphRef.getUnicodeString();
             logger.info("silk job started");
         }
 
