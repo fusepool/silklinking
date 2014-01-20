@@ -149,7 +149,7 @@ public class SilkInterlinker implements Interlinker {
             bundleContext = ctx;
             this.sparqlEndpoint = sparqlEndpoint;
             this.sparqlGraph = targetGraphRef.getUnicodeString();
-            logger.info("silk job started");
+            logger.info("Silk job started");
         }
 
         @SuppressWarnings("unused")
@@ -201,17 +201,12 @@ public class SilkInterlinker implements Interlinker {
          * @throws IOException
          */
         private void buildConfig() throws IOException {
-            InputStream cfgIs = this.getClass().getResourceAsStream("silk-config-applicants-test.xml");
+            InputStream cfgIs = this.getClass().getResourceAsStream("silk-config-patents-agents.xml");
             String roughConfig = IOUtils.toString(cfgIs, "UTF-8");
             roughConfig = StringUtils.replace(roughConfig, SPARQL_ENDPOINT_01_TAG, sparqlEndpoint);
             
             if (sparqlGraph != null && !"".equals(sparqlGraph)) {
-                /*
-            	String graphParamFragment = "<Param name=\"graph\" value=\""
-                        + sparqlGraph + "\"" + "></Param>";
                 
-                roughConfig = StringUtils.replace(roughConfig, SPARQL_GRAPH_01_TAG, graphParamFragment);
-                */
                 roughConfig = StringUtils.replace(roughConfig, SPARQL_GRAPH_01_TAG, sparqlGraph);
                 
             } else {
