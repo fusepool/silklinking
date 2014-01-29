@@ -79,7 +79,8 @@ public class SilkInterlinker implements Interlinker {
      */
     public static final int DEFAULT_SERVICE_RANKING = 101;
 
-    public static final String DEFAULT_SPARQL_ENDPOINT = "http://localhost:8080/sparql";
+    //public static final String DEFAULT_SPARQL_ENDPOINT = "http://localhost:8080/sparql";
+    public static final String DEFAULT_SPARQL_ENDPOINT = "http://platform.fusepool.info/sparql";
 
     // Labels for the component configuration panel
     public static final String SPARQL_ENDPOINT_LABEL = "Endpoint";
