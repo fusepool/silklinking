@@ -79,8 +79,8 @@ public class SilkInterlinker implements Interlinker {
      */
     public static final int DEFAULT_SERVICE_RANKING = 101;
 
-    //public static final String DEFAULT_SPARQL_ENDPOINT = "http://localhost:8080/sparql";
-    public static final String DEFAULT_SPARQL_ENDPOINT = "http://platform.fusepool.info/sparql";
+    public static final String DEFAULT_SPARQL_ENDPOINT = "http://localhost:8080/sparql";
+    //public static final String DEFAULT_SPARQL_ENDPOINT = "http://platform.fusepool.info/sparql";
 
     // Labels for the component configuration panel
     public static final String SPARQL_ENDPOINT_LABEL = "Endpoint";
@@ -117,9 +117,9 @@ public class SilkInterlinker implements Interlinker {
     }
 
     public TripleCollection interlink(TripleCollection dataToInterlink,
-            UriRef targetGraphRef) {
+            UriRef targetGraphRef, String linkSpecId) {
         SilkJob job = new SilkJob(bundleContext, sparqlEndpoint, targetGraphRef);
-        return job.executeJob(dataToInterlink);
+        return job.executeJob(dataToInterlink, linkSpecId);
     }
 
     public class SilkJob {
@@ -154,19 +154,22 @@ public class SilkInterlinker implements Interlinker {
         }
 
         @SuppressWarnings("unused")
-        public MGraph executeJob(TripleCollection dataToInterlink) {
+        public MGraph executeJob(TripleCollection dataToInterlink, String linkSpecId) {
 
             jobId = UUID.randomUUID().toString();
+            logger.info("executing job " + jobId);
             try {
                 TripleCollection inputGraph = null;
                 createTempFiles();
-
+                // serialize the source graph in a file
+                logger.info("serializing the source graph of size " + dataToInterlink.size() + " in a file");
                 OutputStream rdfOS = new FileOutputStream(rdfData);
                 serializer.serialize(rdfOS, dataToInterlink, SupportedFormat.RDF_XML);
                 rdfOS.close();
+                logger.info("building Silk config file with Sparql endpoint and target graph");
                 buildConfig();
-
-                silk.executeStream(IOUtils.toInputStream(config, "UTF-8"), null, 1, true);
+                logger.info("Executing interlinking task");
+                silk.executeStream(IOUtils.toInputStream(config, "UTF-8"), linkSpecId, 1, true);
 
 			    // This graph will contain the results of the duplicate detection
                 // i.e. owl:sameAs statements
@@ -218,7 +221,7 @@ public class SilkInterlinker implements Interlinker {
             config = StringUtils.replace(roughConfig, OUTPUT_TMP_TAG, outputData.getAbsolutePath());
             
             logger.info("configuration built for the job:" + jobId+"\n"+config) ;
-            //System.out.println("configuration built for the job:" + jobId + "\n" + config);
+            
         }
 
         /**
