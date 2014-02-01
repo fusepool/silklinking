@@ -73,7 +73,7 @@
 
 			<Outputs>
 			 
-				<Output type="file" minConfidence="0.9">
+				<Output type="file" minConfidence="0.99">
 					<Param name="file"
 						value="[OUTPUT_TMP_FILE_PATH]" />
 					<Param name="format" value="ntriples" />
