@@ -1,0 +1,72 @@
+<Silk>
+	<Prefixes>
+		<Prefix namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="rdf"></Prefix>
+		<Prefix namespace="http://www.w3.org/2002/07/owl#" id="owl"></Prefix>
+		<Prefix namespace="http://xmlns.com/foaf/0.1/" id="foaf"></Prefix>
+		<Prefix namespace="http://www.w3.org/2000/01/rdf-schema#" id="rdfs"></Prefix>
+		<Prefix namespace="http://purl.org/ontology/bibo/" id="bibo"></Prefix>
+		<Prefix namespace="http://purl.org/dc/terms/" id="dcterms"></Prefix>
+		<Prefix namespace="http://fise.iks-project.eu/ontology/" id="fise"></Prefix>
+	</Prefixes>
+	<DataSources>
+		<DataSource id="source" type="file">
+			<Param name="file" value="[SOURCE_RDF_FILE]" />
+			<Param name="format" value="RDF/XML" />
+		</DataSource>
+		
+		<DataSource id="master" type="sparqlEndpoint">
+			<Param name="endpointURI" value="[TARGET_ENDPOINT]" />
+			<Param name="graph" value="[TARGET_GRAPH]" />
+			<Param name="login" value="admin" />
+			<Param name="password" value="admin" />
+			<Param name="pageSize" value="50000" />
+		</DataSource>
+	</DataSources>
+
+	<Blocking blocks="100" enabled="true" />
+
+	<Interlinks>
+		<Interlink id="contributors">
+			<LinkType>owl:sameAs</LinkType>
+			<SourceDataset dataSource="source" var="contributor_a">
+				<RestrictTo> 
+                                 ?publication dcterms:contributor ?contributor_a .
+                                 ?contributor_a foaf:firstName ?contrib_name .
+	                         ?contributor_a foaf:lastName ?contrib_lastname .
+				</RestrictTo>
+			</SourceDataset>
+			<TargetDataset dataSource="master" var="contributor_b">
+				<RestrictTo>  
+                                 ?publication dcterms:contributor ?contributor_b .
+                                 ?contributor_b foaf:firstName ?contrib_name .
+	                         ?contributor_b foaf:lastName ?contrib_lastname .
+				</RestrictTo>
+			</TargetDataset>
+			<LinkageRule>
+                                <Aggregate type="average">
+					<Compare metric="jaroWinkler" threshold="0.90">
+						<Input path="?contributor_a/foaf:firstName"></Input>
+						<Input path="?contributor_b/foaf:firstName"></Input>
+					</Compare>
+                                	<Compare metric="jaroWinkler" threshold="0.90">
+                                        	<Input path="?contributor_a/foaf:lastName"></Input>
+                                        	<Input path="?contributor_b/foaf:lastName"></Input>
+                                	</Compare>
+                                </Aggregate>
+			</LinkageRule>
+
+			<Filter threshold="0.90"></Filter>
+
+			<Outputs>
+			 
+				<Output type="file" minConfidence="0.95">
+					<Param name="file"
+						value="[ACCEPT_LINKS_FILE_PATH]" />
+					<Param name="format" value="ntriples" />
+				</Output>
+                               
+			</Outputs>
+		</Interlink>
+		
+	</Interlinks>
+</Silk>
