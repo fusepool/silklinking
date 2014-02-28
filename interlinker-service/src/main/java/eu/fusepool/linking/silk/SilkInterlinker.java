@@ -20,7 +20,6 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import eu.fusepool.datalifecycle.Interlinker;
 import eu.fusepool.java.silk.client.SilkClient;
 import eu.fusepool.java.silk.client.SilkException;
@@ -86,7 +85,7 @@ public class SilkInterlinker implements Interlinker {
      * - Sparql endpoint
      * - instance name (this property is used to select the link specifications (config file)
      */
-    public static final String DEFAULT_SPARQL_ENDPOINT = "http://vmyuki.bfh.ch:8580/sparql";
+    public static final String DEFAULT_SPARQL_ENDPOINT = "http://localhost:8080/sparql";
     //public static final String DEFAULT_SPARQL_ENDPOINT = "http://platform.fusepool.info/sparql";
     // Label for the component configuration panel
     public static final String SPARQL_ENDPOINT_LABEL = "SPARQL endpoint";
@@ -109,11 +108,10 @@ public class SilkInterlinker implements Interlinker {
     protected ComponentContext componentContext;
     protected BundleContext bundleContext;
 
-    
+    // properties file containing a list of all the silk configuration files available
+    java.util.Properties linkSpecList = null;
 
     String sparqlGraph = "";
-
-    private final static boolean isDebug = true;
 
     @Activate
     protected void activate(ComponentContext ce) throws IOException,
@@ -126,7 +124,7 @@ public class SilkInterlinker implements Interlinker {
         // set the endpoint from the component configuration
         Object endpointObj = dict.get(SilkInterlinker.SPARQL_ENDPOINT_NAME);
         if (endpointObj != null && !"".equals(endpointObj.toString())) {
-            sparqlEndpoint = (String) endpointObj;
+            sparqlEndpoint = endpointObj.toString();
         }
         
         // set the name of the interlinker instance from the component configuration
@@ -134,6 +132,14 @@ public class SilkInterlinker implements Interlinker {
         if (interlinkerNameObj != null && !"".equals(interlinkerNameObj.toString())) {
             interlinkerInstanceName = (String) interlinkerNameObj;
         }
+        
+        // load the list of silk configuration files available 
+        logger.info("Loading silk configuration files.");
+        linkSpecList = new java.util.Properties();
+        InputStream linkSpecListStream = this.getClass().getResourceAsStream("linkspeclist.txt");
+        linkSpecList.load(linkSpecListStream);
+        logger.info("Loaded " + linkSpecList.size() + " silk configuration files");
+        linkSpecListStream.close();
         
         logger.info("The Silk Linking Service is being activated. SPARQL endpoint: " + sparqlEndpoint + ", Instance name: " + interlinkerInstanceName);
 
@@ -156,33 +162,33 @@ public class SilkInterlinker implements Interlinker {
 
     public class SilkJob {
 
-        private static final String CI_METADATA_TAG = "[CI_METADATA_FILE]";
-        private static final String OUTPUT_TMP_TAG = "[OUTPUT_TMP_FILE_PATH]";
-        private static final String SPARQL_ENDPOINT_01_TAG = "[SPARQL_ENDPOINT_01]";
-        private static final String SPARQL_GRAPH_01_TAG = "[GRAPH_PARAMETER]";
+        private static final String SOURCE_RDF_FILE_TAG = "[SOURCE_RDF_FILE]";
+        private static final String ACCEPT_LINKS_FILE_PATH_TAG = "[ACCEPT_LINKS_FILE_PATH]";
+        private static final String TARGET_ENDPOINT_TAG = "[TARGET_ENDPOINT]";
+        private static final String TARGET_GRAPH_TAG = "[TARGET_GRAPH]";
 
         // sparql endpoint
         String sparqlEndpoint;
-        String sparqlGraph;
+        
+        // target graph to be set in the silk config file
+        String targetGraph;
 
         private static final boolean holdDataFiles = true;
-        // private boolean stick2RDF_XML = false ;
 
         protected BundleContext bundleContext;
 
+        // id of the interlinking job
         private String jobId;
         
         
         File rdfData; // source RDF data
-        File outputData;
+        File outputData; //accepted intelinks file 
 
-        String config;
-
-        public SilkJob(BundleContext ctx, String sparqlEndpoint, UriRef targetGraphRef) {
+        public SilkJob(BundleContext ctx, String endpoint, UriRef graphRef) {
             bundleContext = ctx;
-            this.sparqlEndpoint = sparqlEndpoint;
-            this.sparqlGraph = targetGraphRef.getUnicodeString();
-            logger.info("Silk job started");
+            this.sparqlEndpoint = endpoint;
+            this.targetGraph = graphRef.getUnicodeString();
+            logger.info("Silk job started. Endpoint: " + sparqlEndpoint + ", graph: " + targetGraph);
         }
 
         @SuppressWarnings("unused")
@@ -194,15 +200,16 @@ public class SilkInterlinker implements Interlinker {
                 TripleCollection inputGraph = null;
                 createTempFiles();
                 // serialize the source graph in a file
-                logger.info("serializing the source graph of size " + dataToInterlink.size() + " in a file");
+                logger.info("Serializing the source graph of size " + dataToInterlink.size() + " in a file");
                 OutputStream rdfOS = new FileOutputStream(rdfData);
                 serializer.serialize(rdfOS, dataToInterlink, SupportedFormat.RDF_XML);
                 rdfOS.close();
-                logger.info("building Silk config file with Sparql endpoint and target graph");
-                buildConfig();
+                logger.info("Source graph serialization completed.");
+                logger.info("Building Silk config file with Sparql endpoint and target graph");
+                String silkConfig = buildConfig(interlinkerInstanceName);
                 logger.info("Executing all link specifications in the SILK config file");
                 // execute all the link specifications in the silk config file (set the 2nd argument to null)
-                silk.executeStream(IOUtils.toInputStream(config, "UTF-8"), null, 1, true);
+                silk.executeStream(IOUtils.toInputStream(silkConfig, "UTF-8"), null, 1, true);
 
 			    // This graph will contain the results of the duplicate detection
                 // i.e. owl:sameAs statements
@@ -233,27 +240,31 @@ public class SilkInterlinker implements Interlinker {
         }
 
         /**
-         * builds the configuration for the silk job
+         * Builds the configuration for the silk job. The template config file is selected by
+         * the name of the instance from a list in a properties file.
          *
          * @throws IOException
          */
-        private void buildConfig() throws IOException {
-            InputStream cfgIs = this.getClass().getResourceAsStream("silk-config-patents-agents.xml");
-            String roughConfig = IOUtils.toString(cfgIs, "UTF-8");
-            roughConfig = StringUtils.replace(roughConfig, SPARQL_ENDPOINT_01_TAG, sparqlEndpoint);
+        private String buildConfig(String instanceName) throws IOException {
+            // Load the template config file to be updated with endpoint and graph set in the component configuration panel
+            InputStream cfgIs = this.getClass().getResourceAsStream(linkSpecList.getProperty(instanceName));
+            String silkConfig = IOUtils.toString(cfgIs, "UTF-8");
+            silkConfig = StringUtils.replace(silkConfig, TARGET_ENDPOINT_TAG, this.sparqlEndpoint);
             
-            if (sparqlGraph != null && !"".equals(sparqlGraph)) {
+            if (this.targetGraph != null && !"".equals(this.targetGraph)) {
                 
-                roughConfig = StringUtils.replace(roughConfig, SPARQL_GRAPH_01_TAG, sparqlGraph);
+                silkConfig = StringUtils.replace(silkConfig, TARGET_GRAPH_TAG, this.targetGraph);
                 
             } else {
-                roughConfig = StringUtils.replace(roughConfig, SPARQL_GRAPH_01_TAG, "");
+                silkConfig = StringUtils.replace(silkConfig, TARGET_GRAPH_TAG, "");
             }
             
-            roughConfig = StringUtils.replace(roughConfig, CI_METADATA_TAG, rdfData.getAbsolutePath());
-            config = StringUtils.replace(roughConfig, OUTPUT_TMP_TAG, outputData.getAbsolutePath());
+            silkConfig = StringUtils.replace(silkConfig, SOURCE_RDF_FILE_TAG, rdfData.getAbsolutePath());
+            silkConfig = StringUtils.replace(silkConfig, ACCEPT_LINKS_FILE_PATH_TAG, outputData.getAbsolutePath());
             
-            logger.info("configuration built for the job:" + jobId+"\n"+config) ;
+            logger.info("Silk configuration file built for the job:" + jobId + "\n" + silkConfig) ;
+            
+            return silkConfig;
             
         }
 
@@ -294,10 +305,10 @@ public class SilkInterlinker implements Interlinker {
         }
 
         /**
-         * @param sparqlGraph the sparqlGraph to set
+         * @param graph name the target graph to be set in silk config file. 
          */
-        public void setSparqlGraph(String sparqlGraph) {
-            this.sparqlGraph = sparqlGraph;
+        public void setSparqlGraph(String graphName) {
+            this.targetGraph = graphName;
         }
     }
 }
