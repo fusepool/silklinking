@@ -1,0 +1,2 @@
+patent=silk-config-patents.xml
+pubmed=silk-config-pubmed.xml
