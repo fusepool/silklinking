@@ -1,0 +1,86 @@
+<Silk>
+	<Prefixes>
+		<Prefix namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="rdf" />
+		<Prefix namespace="http://www.w3.org/2002/07/owl#" id="owl" />
+		<Prefix namespace="http://xmlns.com/foaf/0.1/" id="foaf" />
+		<Prefix namespace="http://www.w3.org/2000/01/rdf-schema#" id="rdfs" />
+		<Prefix namespace="http://www.patexpert.org/ontologies/pmo.owl#" id="pmo" />
+		<Prefix namespace="http://purl.org/dc/terms/" id="dcterms" />
+		<Prefix namespace="http://fise.iks-project.eu/ontology/" id="fise" />
+	</Prefixes>
+	<DataSources>
+		<DataSource id="source" type="file">
+			<Param name="file" value="[SOURCE_RDF_FILE]" />
+			<Param name="format" value="RDF/XML" />
+		</DataSource>
+		
+		<DataSource id="master" type="sparqlEndpoint">
+			<Param name="endpointURI" value="[TARGET_ENDPOINT]" />
+			<Param name="graph" value="[TARGET_GRAPH]" />
+			<Param name="login" value="admin" />
+			<Param name="password" value="admin" />
+			<Param name="pageSize" value="50000" />
+		</DataSource>
+	</DataSources>
+
+	<Blocking blocks="100" />
+	
+	<Interlinks>
+				
+		<Interlink id="agents">
+			<LinkType>owl:sameAs</LinkType>
+			<SourceDataset dataSource="source" var="agent_a">
+				<RestrictTo>				
+ 				{
+ 				?patent rdf:type pmo:PatentPublication .
+				?patent pmo:inventor ?agent_a .
+				}
+				union
+				{
+				?agent_a rdf:type foaf:Agent .
+				?patent pmo:applicant ?agent_a .
+				}				
+				</RestrictTo>
+			</SourceDataset>
+			<TargetDataset dataSource="master" var="agent_b">
+				<RestrictTo>				 
+ 				{
+ 				?patent rdf:type pmo:PatentPublication .
+				?patent pmo:inventor ?agent_b .
+				}
+				union
+				{
+				?agent_a rdf:type foaf:Agent .
+				?patent pmo:applicant ?agent_b .
+				}					
+				</RestrictTo>
+			</TargetDataset>
+
+			<LinkageRule>
+				<Aggregate type="average">
+					<Compare metric="jaroWinkler">
+						<TransformInput function="lowerCase">
+							<Input path="?agent_a/rdfs:label" />
+						</TransformInput>
+						<TransformInput function="lowerCase">
+							<Input path="?agent_b/rdfs:label" />
+						</TransformInput>
+					</Compare>
+				</Aggregate>
+			</LinkageRule>
+			
+			<Filter threshold="0.7" />
+
+			<Outputs>
+			 
+				<Output type="file" minConfidence="0.95">
+					<Param name="file"
+						value="[ACCEPT_LINKS_FILE_PATH]" />
+					<Param name="format" value="ntriples" />
+				</Output>
+			
+			</Outputs>
+		</Interlink>
+			
+	</Interlinks>
+</Silk>
