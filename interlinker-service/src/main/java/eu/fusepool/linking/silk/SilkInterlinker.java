@@ -44,33 +44,11 @@ import org.apache.felix.scr.annotations.Reference;
  * @author luigi
  *
  */
-@Component(immediate = true, metatype = true, configurationFactory = true, // allows multiple instances
-        policy = ConfigurationPolicy.OPTIONAL)
-@Service(value=Interlinker.class)
-@Properties(value = {
-    @Property(name = Constants.SERVICE_RANKING, 
-    		  intValue = SilkInterlinker.DEFAULT_SERVICE_RANKING),
-    @Property(name = SilkInterlinker.SPARQL_ENDPOINT_NAME,
-              label= SilkInterlinker.SPARQL_ENDPOINT_LABEL,
-    		  value = SilkInterlinker.DEFAULT_SPARQL_ENDPOINT, 
-    		  description = SilkInterlinker.SPARQL_ENDPOINT_DESCRIPTION),
-    		  @Property(name = SilkInterlinker.INSTANCE_PROPERTY_NAME,
-              label= SilkInterlinker.INSTANCE_PROPERTY_LABEL,
-              value = "", 
-              description = SilkInterlinker.INSTANCE_PROPERTY_DESCRIPTION)})
-public class SilkInterlinker implements Interlinker {
+public abstract class SilkInterlinker implements Interlinker {
 
     private static Logger logger = LoggerFactory.getLogger(SilkInterlinker.class);
 
-    @Reference
-    private Parser parser;
     
-    @Reference
-    private Serializer serializer;
-    
-    // Silk Interlinking service
-    @Reference
-    private SilkClient silk;
     
     /**
      * Default value for the {@link Constants#SERVICE_RANKING} used by this
@@ -94,17 +72,9 @@ public class SilkInterlinker implements Interlinker {
     // Component description in the config panel
     public static final String SPARQL_ENDPOINT_DESCRIPTION = "SPARQL endpoint of the target (master) repository";
     // sparql endpoint variable set at the bundle activation from the component configuration panel
-    String sparqlEndpoint = this.DEFAULT_SPARQL_ENDPOINT;
+    String sparqlEndpoint = SilkInterlinker.DEFAULT_SPARQL_ENDPOINT;
     
-    // Interlinker instance property name. Each instance uses a specific interlink configuration file
-    public static final String INSTANCE_PROPERTY_NAME = "instance";
-    // Instance property label
-    public static final String INSTANCE_PROPERTY_LABEL = "Interlinker name";
-    // Instance property description 
-    public static final String INSTANCE_PROPERTY_DESCRIPTION = "Name of the interlinker instance. it is used to select an interlinker with specific rules";
-    // interlinker instance name set at the bundle activation from the component configuration panel
-    String interlinkerInstanceName = "";
-    
+
     protected ComponentContext componentContext;
     protected BundleContext bundleContext;
 
@@ -126,22 +96,8 @@ public class SilkInterlinker implements Interlinker {
         if (endpointObj != null && !"".equals(endpointObj.toString())) {
             sparqlEndpoint = endpointObj.toString();
         }
-        
-        // set the name of the interlinker instance from the component configuration
-        Object interlinkerNameObj = dict.get(SilkInterlinker.INSTANCE_PROPERTY_NAME);
-        if (interlinkerNameObj != null && !"".equals(interlinkerNameObj.toString())) {
-            interlinkerInstanceName = (String) interlinkerNameObj;
-        }
-        
-        // load the list of silk configuration files available 
-        logger.info("Loading silk configuration files.");
-        linkSpecList = new java.util.Properties();
-        InputStream linkSpecListStream = this.getClass().getResourceAsStream("linkspeclist.txt");
-        linkSpecList.load(linkSpecListStream);
-        logger.info("Loaded " + linkSpecList.size() + " silk configuration files");
-        linkSpecListStream.close();
-        
-        logger.info("The Silk Linking Service is being activated. SPARQL endpoint: " + sparqlEndpoint + ", Instance name: " + interlinkerInstanceName);
+
+        logger.info("The {} Silk Linking Service is being activated. SPARQL endpoint: {}", getName(), sparqlEndpoint);
 
     }
 
@@ -156,10 +112,16 @@ public class SilkInterlinker implements Interlinker {
     }
     
     // name set in component configuration panel
-    public String getName() {
-        return interlinkerInstanceName;
-    }
+    public abstract String getName();
+    
+    protected abstract InputStream getConfigTemplate();
+    
+    protected abstract Parser getParser();
 
+    protected abstract Serializer getSerializer();
+
+    protected abstract SilkClient getSilk();
+    
     public class SilkJob {
 
         private static final String SOURCE_RDF_FILE_TAG = "[SOURCE_RDF_FILE]";
@@ -202,21 +164,20 @@ public class SilkInterlinker implements Interlinker {
                 // serialize the source graph in a file
                 logger.info("Serializing the source graph of size " + dataToInterlink.size() + " in a file");
                 OutputStream rdfOS = new FileOutputStream(rdfData);
-                serializer.serialize(rdfOS, dataToInterlink, SupportedFormat.RDF_XML);
+                getSerializer().serialize(rdfOS, dataToInterlink, SupportedFormat.RDF_XML);
                 rdfOS.close();
                 logger.info("Source graph serialization completed.");
                 logger.info("Building Silk config file with Sparql endpoint and target graph");
-                String silkConfig = buildConfig(interlinkerInstanceName);
+                String silkConfig = buildConfig();
                 logger.info("Executing all link specifications in the SILK config file");
                 // execute all the link specifications in the silk config file (set the 2nd argument to null)
-                silk.executeStream(IOUtils.toInputStream(silkConfig, "UTF-8"), null, 1, true);
+                getSilk().executeStream(IOUtils.toInputStream(silkConfig, "UTF-8"), null, 1, true);
 
 			    // This graph will contain the results of the duplicate detection
                 // i.e. owl:sameAs statements
                 MGraph owlSameAsStatements = new SimpleMGraph();
                 InputStream is = new FileInputStream(outputData);
-                Set<String> formats = parser.getSupportedFormats();
-                parser.parse(owlSameAsStatements, is, SupportedFormat.N_TRIPLE);
+                getParser().parse(owlSameAsStatements, is, SupportedFormat.N_TRIPLE);
                 is.close();
                 
                 logger.info(owlSameAsStatements.size() + " triples extracted by job: " + jobId);
@@ -245,9 +206,10 @@ public class SilkInterlinker implements Interlinker {
          *
          * @throws IOException
          */
-        private String buildConfig(String instanceName) throws IOException {
+        private String buildConfig() throws IOException {
             // Load the template config file to be updated with endpoint and graph set in the component configuration panel
-            InputStream cfgIs = this.getClass().getResourceAsStream(linkSpecList.getProperty(instanceName));
+            //InputStream cfgIs = this.getClass().getResourceAsStream(linkSpecList.getProperty(instanceName));
+            InputStream cfgIs = getConfigTemplate();
             String silkConfig = IOUtils.toString(cfgIs, "UTF-8");
             silkConfig = StringUtils.replace(silkConfig, TARGET_ENDPOINT_TAG, this.sparqlEndpoint);
             
