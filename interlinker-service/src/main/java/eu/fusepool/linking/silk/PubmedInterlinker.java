@@ -42,7 +42,7 @@ import org.osgi.service.component.ComponentContext;
               label= SilkInterlinker.SPARQL_ENDPOINT_LABEL,
     		  value = SilkInterlinker.DEFAULT_SPARQL_ENDPOINT, 
     		  description = SilkInterlinker.SPARQL_ENDPOINT_DESCRIPTION)})
-public class PatentInterlinker extends SilkInterlinker {
+public class PubmedInterlinker extends SilkInterlinker {
 
     @Reference
     private Parser parser;
@@ -54,27 +54,14 @@ public class PatentInterlinker extends SilkInterlinker {
     @Reference
     private SilkClient silk;
     
-    @Activate
-    @Override
-    protected void activate(ComponentContext ce) throws IOException,
-            ConfigurationException {
-        super.activate(ce);
-
-    }
-
-    @Deactivate
-    @Override
-    protected void deactivate(ComponentContext context) {
-        super.deactivate(context);
-    }
     @Override
     public String getName() {
-        return "silk-patents";
+        return "silk-pubmed";
     }
 
     @Override
     protected InputStream getConfigTemplate() {
-        return this.getClass().getResourceAsStream("silk-config-patents.xml");
+        return this.getClass().getResourceAsStream("silk-config-pubmed.xml");
     }
 
     public Parser getParser() {
