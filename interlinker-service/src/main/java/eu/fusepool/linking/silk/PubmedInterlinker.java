@@ -61,7 +61,7 @@ public class PubmedInterlinker extends SilkInterlinker {
 
     @Override
     protected InputStream getConfigTemplate() {
-        return this.getClass().getResourceAsStream("silk-config-pubmed.xml");
+        return this.getClass().getResourceAsStream("silk-config-pubmed-agents.xml");
     }
 
     public Parser getParser() {
