@@ -59,11 +59,15 @@
 			<LinkageRule>
 				<Aggregate type="average">
 					<Compare metric="jaroWinkler">
+					    <TransformInput function="removeSpecialChars">
 						<TransformInput function="lowerCase">
 							<Input path="?agent_a/rdfs:label" />
 						</TransformInput>
+						</TransformInput>
+						<TransformInput function="removeSpecialChars">
 						<TransformInput function="lowerCase">
 							<Input path="?agent_b/rdfs:label" />
+						</TransformInput>
 						</TransformInput>
 					</Compare>
 				</Aggregate>
