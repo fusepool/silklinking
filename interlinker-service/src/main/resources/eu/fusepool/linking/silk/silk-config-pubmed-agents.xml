@@ -1,0 +1,102 @@
+<Silk>
+	<Prefixes>
+		<Prefix namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#" id="rdf"></Prefix>
+		<Prefix namespace="http://www.w3.org/2002/07/owl#" id="owl"></Prefix>
+		<Prefix namespace="http://xmlns.com/foaf/0.1/" id="foaf"></Prefix>
+		<Prefix namespace="http://www.w3.org/2000/01/rdf-schema#" id="rdfs"></Prefix>
+		<Prefix namespace="http://purl.org/ontology/bibo/" id="bibo"></Prefix>
+		<Prefix namespace="http://purl.org/dc/terms/" id="dcterms"></Prefix>
+		<Prefix namespace="http://fise.iks-project.eu/ontology/" id="fise"></Prefix>
+        <Prefix namespace="http://schema.org/" id="schema"></Prefix>
+	</Prefixes>
+	<DataSources>
+		<DataSource id="source" type="file">
+			<Param name="file" value="[SOURCE_RDF_FILE]" />
+			<Param name="format" value="RDF/XML" />
+		</DataSource>
+		
+		<DataSource id="target" type="sparqlEndpoint">
+			<Param name="endpointURI" value="[TARGET_ENDPOINT]" />
+			<Param name="graph" value="[TARGET_GRAPH]" />
+			<Param name="login" value="admin" />
+			<Param name="password" value="admin" />
+			<Param name="pageSize" value="50000" />
+		</DataSource>
+	</DataSources>
+
+	<Blocking blocks="100" />
+
+	<Interlinks>
+		<Interlink id="affiliations">
+			<LinkType>owl:sameAs</LinkType>
+			<SourceDataset dataSource="source" var="organization_a">
+				<RestrictTo> 
+                                ?contributor schema:affiliation ?organization_a .
+                                ?organization_a foaf:name ?name . 
+				</RestrictTo>
+			</SourceDataset>
+			<TargetDataset dataSource="target" var="organization_b">
+				<RestrictTo>  
+                                 ?contributor schema:affiliation ?organization_b .
+                                 ?organization_b foaf:name ?name .
+				</RestrictTo>
+			</TargetDataset>
+			<LinkageRule>
+				<Compare metric="jaroWinkler" threshold="0.95">                                        
+					<Input path="?organization_a/foaf:name"></Input>                                       
+					<Input path="?organization_b/foaf:name"></Input>
+				</Compare>
+			</LinkageRule>
+            <Filter threshold="0.95"></Filter>
+			<Outputs>
+			 
+				<Output type="file" minConfidence="0.995">
+					        <Param name="file"
+						      value="[ACCEPT_LINKS_FILE_PATH]" />
+					        <Param name="format" value="ntriples" />
+				      </Output>
+			
+			</Outputs>
+		</Interlink>
+		
+		<Interlink id="contributors">
+					<LinkType>owl:sameAs</LinkType>
+					<SourceDataset dataSource="source" var="contributor_a">
+						<RestrictTo> 
+		                    ?publication dcterms:contributor ?contributor_a .
+		                    ?contributor_a foaf:firstName ?contrib_name .
+			                ?contributor_a foaf:lastName ?contrib_lastname .
+						</RestrictTo>
+					</SourceDataset>
+					<TargetDataset dataSource="target" var="contributor_b">
+						<RestrictTo>  
+		                    ?publication dcterms:contributor ?contributor_b .
+		                    ?contributor_b foaf:firstName ?contrib_name .
+			                ?contributor_b foaf:lastName ?contrib_lastname .
+						</RestrictTo>
+					</TargetDataset>
+					<LinkageRule>
+		                    <Aggregate type="average">
+							<Compare metric="jaroWinkler" threshold="0.95">
+								<Input path="?contributor_a/foaf:firstName"></Input>
+								<Input path="?contributor_b/foaf:firstName"></Input>
+							</Compare>
+		                    <Compare metric="jaroWinkler" >
+		                       <Input path="?contributor_a/foaf:lastName"></Input>
+		                       <Input path="?contributor_b/foaf:lastName"></Input>
+		                    </Compare>
+		                    </Aggregate>
+					</LinkageRule>
+				        <Filter threshold="0.95"></Filter>
+					<Outputs>
+					 
+						<Output type="file" minConfidence="0.995">
+					        <Param name="file"
+						      value="[ACCEPT_LINKS_FILE_PATH]" />
+					        <Param name="format" value="ntriples" />
+				      </Output>
+					</Outputs>
+		</Interlink>
+		
+	</Interlinks>
+</Silk>
