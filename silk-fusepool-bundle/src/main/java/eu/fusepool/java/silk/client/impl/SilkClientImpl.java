@@ -27,22 +27,6 @@ public class SilkClientImpl implements SilkClient {
     protected ComponentContext componentContext;
 
     /* (non-Javadoc)
-     * @see eu.fusepool.java.silk.client.SilkClient#excute()
-     */
-    public void execute() {
-        InputStream configStream = SilkClientImpl.class.getResourceAsStream("/config/silk-bundle-config2.xml");
-        Silk.executeStream(configStream, null, 1, true);
-        /*
-         File file = ctx.getDataFile("SilkClientFile.txt") ;
-         if(file!=null) {
-         System.out.println("\n\n######################\n"+file.getAbsolutePath()+"\n###########");
-         } else {
-         System.out.println("\n\n######################\n"+"nessun file creato"+"\n###########");
-         }
-         */
-    }
-
-    /* (non-Javadoc)
      * @see eu.fusepool.java.silk.client.SilkClient#executeStream(java.io.InputStream, java.lang.String, int, boolean)
      */
     public void executeStream(InputStream config, String linkSpecId,

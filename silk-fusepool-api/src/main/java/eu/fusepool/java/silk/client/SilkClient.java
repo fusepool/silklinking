@@ -24,12 +24,6 @@ import java.io.InputStream;
  */
 public interface SilkClient {
 
-    /**
-     * Starts a reconciliation/interlinking task. It uses rules from a default configuration file.
-     *
-     * @throws Exception
-     */
-    void execute() throws SilkException;
 
     /**
      *
