@@ -42,13 +42,6 @@ public class SilkClientImpl implements SilkClient {
         Silk.executeFile(config, linkSpecId, numThreads, reload);
     }
 
-    /* (non-Javadoc)
-     * @see eu.fusepool.java.silk.client.SilkClient#ExecuteConfig()
-     */
-    public void executeConfig() throws Exception {
-        // TODO Auto-generated method stub
-        throw new Exception("not implemented yet!");
-    }
 
     @Activate
     protected void activate(final ComponentContext componentContext) {
@@ -57,21 +50,4 @@ public class SilkClientImpl implements SilkClient {
 
     }
 
-    /**
-     * @param args
-     * @throws Exception
-     */
-    public static void main(String[] args) throws Exception {
-        SilkClient client = new SilkClientImpl();
-        client.execute();
-
-    }
-
-    public BundleContext getCtx() {
-        return ctx;
-    }
-
-    public void setCtx(BundleContext ctx) {
-        this.ctx = ctx;
-    }
 }
