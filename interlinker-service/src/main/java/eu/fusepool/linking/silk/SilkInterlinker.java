@@ -48,8 +48,6 @@ public abstract class SilkInterlinker implements Interlinker {
 
     private static Logger logger = LoggerFactory.getLogger(SilkInterlinker.class);
 
-    
-    
     /**
      * Default value for the {@link Constants#SERVICE_RANKING} used by this
      * engine. This is a negative value to allow easy replacement by this engine
@@ -179,6 +177,10 @@ public abstract class SilkInterlinker implements Interlinker {
                 InputStream is = new FileInputStream(outputData);
                 getParser().parse(owlSameAsStatements, is, SupportedFormat.N_TRIPLE);
                 is.close();
+                
+                // remove triples that can be inferred by a reasoner by reflexivity 
+                // or symmetry of owl:sameAs
+                LinkUtils.removeInferenceableEquivalences(owlSameAsStatements);
                 
                 logger.info(owlSameAsStatements.size() + " triples extracted by job: " + jobId);
                 
