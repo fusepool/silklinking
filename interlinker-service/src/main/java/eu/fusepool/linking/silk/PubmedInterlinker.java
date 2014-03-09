@@ -17,39 +17,23 @@ package eu.fusepool.linking.silk;
 
 import eu.fusepool.datalifecycle.Interlinker;
 import eu.fusepool.java.silk.client.SilkClient;
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.Dictionary;
-import org.apache.clerezza.rdf.core.serializedform.Parser;
-import org.apache.clerezza.rdf.core.serializedform.Serializer;
-import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Deactivate;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.framework.Constants;
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.component.ComponentContext;
 
 @Component(immediate = true, metatype = true)
 @Service(Interlinker.class)
 @Properties({
     @Property(name = Constants.SERVICE_RANKING, 
     		  intValue = SilkInterlinker.DEFAULT_SERVICE_RANKING),
-    @Property(name = SilkInterlinker.SPARQL_ENDPOINT_NAME,
-              label= SilkInterlinker.SPARQL_ENDPOINT_LABEL,
-    		  value = SilkInterlinker.DEFAULT_SPARQL_ENDPOINT, 
-    		  description = SilkInterlinker.SPARQL_ENDPOINT_DESCRIPTION)})
+  })
 public class PubmedInterlinker extends SilkInterlinker {
 
-    @Reference
-    private Parser parser;
-    
-    @Reference
-    private Serializer serializer;
-    
+
     // Silk Interlinking service
     @Reference
     private SilkClient silk;
@@ -64,13 +48,6 @@ public class PubmedInterlinker extends SilkInterlinker {
         return this.getClass().getResourceAsStream("silk-config-pubmed-agents.xml");
     }
 
-    public Parser getParser() {
-        return parser;
-    }
-
-    public Serializer getSerializer() {
-        return serializer;
-    }
 
     public SilkClient getSilk() {
         return silk;

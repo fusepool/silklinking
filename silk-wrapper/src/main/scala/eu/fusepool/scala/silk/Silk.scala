@@ -19,12 +19,17 @@ import de.fuberlin.wiwiss.silk.plugins.Plugins
 import java.io.File
 import de.fuberlin.wiwiss.silk.config.LinkSpecification
 import de.fuberlin.wiwiss.silk.plugins.jena.JenaPlugins
+import eu.fusepool.silk.plugins.FusepoolPlugins
+import eu.fusepool.silk.plugins.{FpSourceDataSource, FpTargetDataSource, FpWriter}
 import de.fuberlin.wiwiss.silk.util.StringUtils._
 import de.fuberlin.wiwiss.silk.util.CollectLogs
 import java.util.logging.{Level, Logger}
 import java.io.InputStream
 import de.fuberlin.wiwiss.silk.GenerateLinksTask
+import org.apache.clerezza.rdf.core.access.{LockableMGraph, TcManager}
+import org.apache.clerezza.rdf.core.{UriRef, TripleCollection}
 //import de.fuberlin.wiwiss.silk.execution.GenerateLinksTask
+import de.fuberlin.wiwiss.silk.datasource.DataSource
 
 /**
  * Executes the complete Silk workflow.
@@ -38,50 +43,13 @@ object Silk {
   private val logger = Logger.getLogger(Silk.getClass.getName)
 
   //Print welcome message on start-up
-  println("Silk Link Discovery Framework - Version 2.5.4")
+  //println("Silk Link Discovery Framework - Version 2.5.3")
 
   //Register all available plugins
   Plugins.register()
+  FusepoolPlugins.register()
   JenaPlugins.register()
 
-  /**
-   * Executes Silk.
-   * The execution is configured using the following properties:
-   *  - 'configFile' (required): The configuration file
-   *  - 'linkSpec' (optional): The link specifications to be executed. If not given, all link specifications are executed.
-   *  - 'threads' (optional): The number of threads to be be used for matching.
-   *  - 'reload' (optional): Specifies if the entity cache is to be reloaded before executing the matching. Default: true
-   */
-  def execute() {
-    System.getProperty("logQueries") match {
-      case BooleanLiteral(b) if b => {
-        Logger.getLogger("de.fuberlin.wiwiss.silk.util.sparql").setLevel(Level.FINE)
-        Logger.getLogger("").getHandlers.foreach(_.setLevel(Level.FINE))
-      }
-      case _ =>
-    }
-
-    val configFile = System.getProperty("configFile") match {
-      case fileName: String => new File(fileName)
-      case _ => throw new IllegalArgumentException("No configuration file specified. Please set the 'configFile' property")
-    }
-
-    val linkSpec = System.getProperty("linkSpec")
-
-    val numThreads = System.getProperty("threads") match {
-      case IntLiteral(num) => num
-      case str: String => throw new IllegalArgumentException("Property 'threads' must be an integer")
-      case _ => DefaultThreads
-    }
-
-    val reload = System.getProperty("reload") match {
-      case BooleanLiteral(b) => b
-      case str: String => throw new IllegalArgumentException("Property 'reload' must be a boolean")
-      case _ => true
-    }
-
-    executeFile(configFile, linkSpec, numThreads, reload)
-  }
 
   /**
    * Executes Silk using a specific configuration file.
@@ -91,9 +59,9 @@ object Silk {
    * @param numThreads The number of threads to be used for matching.
    * @param reload Specifies if the entity cache is to be reloaded before executing the matching. Default: true
    */
-  def executeFile(configFile: File, linkSpecID: String = null, numThreads: Int = DefaultThreads, reload: Boolean = true) {
+  /*def executeFile(configFile: File, linkSpecID: String = null, numThreads: Int = DefaultThreads, reload: Boolean = true) {
     executeConfig(LinkingConfig.load(configFile), linkSpecID, numThreads, reload)
-  }
+  }*/
 
   /**
    * Executes Silk using a specific configuration.
@@ -117,11 +85,22 @@ object Silk {
   }
 
   
+
   
-  
-  def executeStream(configStream: InputStream, linkSpecID: String = null, numThreads: Int = DefaultThreads, reload: Boolean = true) {
-    logger.warning("executeFile!")
+  def executeStream(configStream: InputStream, linkSpecID: String, numThreads: Int, reload: Boolean) {
     executeConfig(LinkingConfig.load(configStream), linkSpecID, numThreads, reload)
+  }
+  
+  def executeStream(sourceGraph: TripleCollection, targetGraphName: UriRef, tcManager: TcManager,
+                    output: TripleCollection,configStream: InputStream, 
+                    linkSpecID: String, numThreads: Int, reload: Boolean) {
+    FpSourceDataSource.set(sourceGraph)
+    FpTargetDataSource.set((targetGraphName, tcManager))
+    FpWriter.set(output)
+    executeConfig(LinkingConfig.load(configStream), linkSpecID, numThreads, reload)
+    FpSourceDataSource.remove()
+    FpTargetDataSource.remove()
+    FpWriter.remove()
   }
   
   
@@ -142,18 +121,5 @@ object Silk {
     ).apply()
   }
 
-  /**
-   * Main method to allow Silk to be started from the command line.
-   */
-  def main(args: Array[String]) {
-    val logs = CollectLogs() {
-      execute()
-    }
 
-    if (logs.isEmpty) {
-      logger.info("Finished execution successfully")
-    } else {
-      logger.warning("The following warnings haven been generated during the execution:\n- " + logs.map(_.getMessage).mkString("\n- "))
-    }
-  }
 }

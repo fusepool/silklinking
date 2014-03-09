@@ -9,17 +9,10 @@
 		<Prefix namespace="http://fise.iks-project.eu/ontology/" id="fise"></Prefix>
 	</Prefixes>
 	<DataSources>
-		<DataSource id="source" type="file">
-			<Param name="file" value="[SOURCE_RDF_FILE]" />
-			<Param name="format" value="RDF/XML" />
+		<DataSource id="source" type="fpSource">
 		</DataSource>
 		
-		<DataSource id="master" type="sparqlEndpoint">
-			<Param name="endpointURI" value="[TARGET_ENDPOINT]" />
-			<Param name="graph" value="[TARGET_GRAPH]" />
-			<Param name="login" value="admin" />
-			<Param name="password" value="admin" />
-			<Param name="pageSize" value="50000" />
+		<DataSource id="master" type="fpTarget">
 		</DataSource>
 	</DataSources>
 
@@ -59,10 +52,7 @@
 
 			<Outputs>
 			 
-				<Output type="file" minConfidence="0.95">
-					<Param name="file"
-						value="[ACCEPT_LINKS_FILE_PATH]" />
-					<Param name="format" value="ntriples" />
+				<Output type="fpWriter" minConfidence="0.95">
 				</Output>
                                
 			</Outputs>

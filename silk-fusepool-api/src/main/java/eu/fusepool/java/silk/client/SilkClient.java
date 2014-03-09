@@ -15,8 +15,9 @@
  */
 package eu.fusepool.java.silk.client;
 
-import java.io.File;
 import java.io.InputStream;
+import org.apache.clerezza.rdf.core.TripleCollection;
+import org.apache.clerezza.rdf.core.UriRef;
 
 /**
  * @author giorgio
@@ -34,15 +35,14 @@ public interface SilkClient {
      * @throws Exception
      */
     void executeStream(InputStream config, String linkSpecId, int numThreads, boolean reload) throws SilkException;
-
+    
     /**
-     *
-     * @param config
-     * @param linkSpecId
-     * @param numThreads
-     * @param reload
-     * @throws Exception
+     * Takes source and target graphs and returns a graph with the interlinks. 
+     * The config must use DataSources of type fpSource and fpTarget and use fpWriter as output
      */
-    void executeFile(File config, String linkSpecId, int numThreads, boolean reload) throws SilkException;
+    TripleCollection executeStream(TripleCollection sourceGraph, UriRef targetGraphName, 
+            InputStream config, String linkSpecId, int numThreads, boolean reload) throws SilkException;
+
+
 
 }

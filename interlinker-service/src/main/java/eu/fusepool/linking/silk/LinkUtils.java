@@ -8,6 +8,7 @@ import org.apache.clerezza.rdf.core.MGraph;
 import org.apache.clerezza.rdf.core.NonLiteral;
 import org.apache.clerezza.rdf.core.Resource;
 import org.apache.clerezza.rdf.core.Triple;
+import org.apache.clerezza.rdf.core.TripleCollection;
 import org.apache.clerezza.rdf.core.impl.SimpleMGraph;
 import org.apache.clerezza.rdf.ontologies.OWL;
 import org.slf4j.Logger;
@@ -23,7 +24,7 @@ public class LinkUtils {
      * {<uri1><owl:sameAs><uri2>, <uri2><owl:sameAs><uri1>}
      * @param graph
      */
-    public static void removeInferenceableEquivalences(MGraph graph) {
+    public static void removeInferenceableEquivalences(TripleCollection graph) {
         //removes equivalences that can be inferred by reflexivity of owl:sameAs
         MGraph reflexGraph = new SimpleMGraph();
         int initialSize = graph.size();

@@ -1,161 +1,165 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
         
-        <parent>
-		<groupId>eu.fusepool</groupId>
-		<artifactId>parent</artifactId>
-		<version>0.1-SNAPSHOT</version>
-		<relativePath>../parent</relativePath>
-	</parent>
+    <parent>
+        <groupId>eu.fusepool</groupId>
+        <artifactId>parent</artifactId>
+        <version>0.1-SNAPSHOT</version>
+        <relativePath>../parent</relativePath>
+    </parent>
         
-	<groupId>eu.fusepool</groupId>
-	<artifactId>silklinking</artifactId>
-	<version>1.0-SNAPSHOT</version>
-	<packaging>pom</packaging>
-	<name>Fusepool-silk integration</name>
+    <groupId>eu.fusepool</groupId>
+    <artifactId>silklinking</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Fusepool SILK integration reactor</name>
+
+    <developers>
+        <developer>
+            <name>Giorgio Costa</name>
+        </developer>
+        <developer>
+            <name>Reto Gmür</name>
+        </developer>
+    </developers>
 
 
-	<developers>
-		<developer>
-			<name>Giorgio Costa</name>
-		</developer>
-	</developers>
-
-
-	<properties>
-		<jersey-version>1.15</jersey-version>
-		<owlapi-version>3.3</owlapi-version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<solr-version>3.6.1</solr-version>
-		<gpg.useagent>true</gpg.useagent>
-		<freemarker-version>2.3.19</freemarker-version>
-		<silk.version>2.5.3</silk.version>
-		<scala.version>2.10.0</scala.version>
-	</properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <silk.version>2.5.3</silk.version>
+        <scala.version>2.9.1</scala.version>
+        <scalatest.version>1.6.1</scalatest.version>
+        <scala.plugin.version>2.15.2</scala.plugin.version>
+        <!-- 
+        <jersey-version>1.15</jersey-version>
+        <owlapi-version>3.3</owlapi-version>
+        <solr-version>3.6.1</solr-version>
+        <gpg.useagent>true</gpg.useagent>
+        <freemarker-version>2.3.19</freemarker-version>
+        <silk.version>2.5.3</silk.version>
+        <scala.version>2.10.0</scala.version> -->
+    </properties>
 
 
 
-	<modules>
-		<module>silk-wrapper</module>
-		<module>silk-fusepool-bundle</module>
-		<module>silk-fusepool-api</module>
+    <modules>
+        <module>silk-plugins</module>
+        <module>silk-wrapper</module>
+        <module>silk-fusepool-bundle</module>
+        <module>silk-fusepool-api</module>
         <module>interlinker-service</module>
-	</modules>
+    </modules>
 
 
-	<dependencyManagement>
-		<dependencies>
+    <dependencyManagement>
+        <dependencies>
 
 
-			<dependency>
-				<groupId>org.osgi</groupId>
-				<artifactId>org.osgi.core</artifactId>
-				<version>4.1.0</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.osgi</groupId>
-				<artifactId>org.osgi.compendium</artifactId>
-				<version>4.1.0</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-log4j12</artifactId>
-				<version>1.6.4</version>
-			</dependency>
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-api</artifactId>
-				<version>1.6.4</version>
-			</dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.core</artifactId>
+                <version>4.1.0</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.compendium</artifactId>
+                <version>4.1.0</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>1.6.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.6.4</version>
+            </dependency>
 
-			<dependency>
-				<groupId>org.scala-lang</groupId>
-				<artifactId>scala-library</artifactId>
-				<version>2.9.1</version>
-			</dependency>
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-library</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
 			
-			<dependency>
-				<groupId>de.fuberlin.wiwiss.silk</groupId>
-				<artifactId>silk-core</artifactId>
-				<version>2.5.3</version>
-			</dependency>
-			<dependency>
-				<groupId>de.fuberlin.wiwiss.silk</groupId>
-				<artifactId>silk-jena</artifactId>
-				<version>2.5.3</version>
-				<exclusions>
-					<exclusion>
-						<groupId>log4j</groupId>
-						<artifactId>log4j</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.slf4j</groupId>
-						<artifactId>*</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>org.clapper</groupId>
-				<artifactId>classutil_2.9.1</artifactId>
-				<version>0.4.3</version>
-			</dependency>
-			<dependency>
-				<groupId>com.thoughtworks.paranamer</groupId>
-				<artifactId>paranamer</artifactId>
-				<version>2.3</version>
-				<!-- <version>2.5.2</version> -->
-			</dependency>
-			<dependency>
-				<groupId>org.clapper</groupId>
-				<artifactId>grizzled-scala_2.9.1</artifactId>
-				<version>1.0.8</version>
-			</dependency>
-			<dependency>
-				<groupId>jline</groupId>
-				<artifactId>jline</artifactId>
-				<version>2.6</version>
-			</dependency>
-			<dependency>
-				<groupId>org.clapper</groupId>
-				<artifactId>grizzled-slf4j_2.9.1</artifactId>
-				<version>0.6.5</version>
-			</dependency>
-			<dependency>
-				<groupId>javax.inject</groupId>
-				<artifactId>javax.inject</artifactId>
-				<version>1</version>
-				<optional>true</optional>
-			</dependency>
-			<dependency>
-				<groupId>org.gnu.readline</groupId>
-				<artifactId>com.springsource.org.gnu.readline</artifactId>
-				<version>0.8.0</version>
-			</dependency>
+            <dependency>
+                <groupId>de.fuberlin.wiwiss.silk</groupId>
+                <artifactId>silk-core</artifactId>
+                <version>${silk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.fuberlin.wiwiss.silk</groupId>
+                <artifactId>silk-jena</artifactId>
+                <version>${silk.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.clapper</groupId>
+                <artifactId>classutil_2.9.1</artifactId>
+                <version>0.4.3</version>
+            </dependency>
+            <dependency>
+                <groupId>com.thoughtworks.paranamer</groupId>
+                <artifactId>paranamer</artifactId>
+                <version>2.3</version>
+                <!-- <version>2.5.2</version> -->
+            </dependency>
+            <dependency>
+                <groupId>org.clapper</groupId>
+                <artifactId>grizzled-scala_2.9.1</artifactId>
+                <version>1.0.8</version>
+            </dependency>
+            <dependency>
+                <groupId>jline</groupId>
+                <artifactId>jline</artifactId>
+                <version>2.6</version>
+            </dependency>
+            <dependency>
+                <groupId>org.clapper</groupId>
+                <artifactId>grizzled-slf4j_2.9.1</artifactId>
+                <version>0.6.5</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.inject</groupId>
+                <artifactId>javax.inject</artifactId>
+                <version>1</version>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>org.gnu.readline</groupId>
+                <artifactId>com.springsource.org.gnu.readline</artifactId>
+                <version>0.8.0</version>
+            </dependency>
 
-			<dependency>
-				<groupId>asm</groupId>
-				<artifactId>asm-all</artifactId>
-				<version>2.2</version>
-			</dependency>
+            <dependency>
+                <groupId>asm</groupId>
+                <artifactId>asm-all</artifactId>
+                <version>2.2</version>
+            </dependency>
 
-		</dependencies>
-	</dependencyManagement>
+        </dependencies>
+    </dependencyManagement>
 
 
-	<!--repositories>
-		<repository>
-			<id>com.springsource.repository.bundles.release</id>
-			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
-			<url>http://repository.springsource.com/maven/bundles/release</url>
-		</repository>
-		<repository>
-			<id>com.springsource.repository.bundles.external</id>
-			<name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
-			<url>http://repository.springsource.com/maven/bundles/external</url>
-		</repository>
-	</repositories-->
+    <!--repositories>
+            <repository>
+                    <id>com.springsource.repository.bundles.release</id>
+                    <name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
+                    <url>http://repository.springsource.com/maven/bundles/release</url>
+            </repository>
+            <repository>
+                    <id>com.springsource.repository.bundles.external</id>
+                    <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
+                    <url>http://repository.springsource.com/maven/bundles/external</url>
+            </repository>
+    </repositories-->
 
 </project>
