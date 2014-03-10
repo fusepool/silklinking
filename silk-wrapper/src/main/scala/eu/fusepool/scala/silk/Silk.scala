@@ -94,12 +94,15 @@ object Silk {
   def executeStream(sourceGraph: TripleCollection, targetGraphName: UriRef, tcManager: TcManager,
                     output: TripleCollection,configStream: InputStream, 
                     linkSpecID: String, numThreads: Int, reload: Boolean) {
-    FpSourceDataSource.set(sourceGraph)
-    FpTargetDataSource.set((targetGraphName, tcManager))
     FpWriter.set(output)
-    executeConfig(LinkingConfig.load(configStream), linkSpecID, numThreads, reload)
-    FpSourceDataSource.remove()
-    FpTargetDataSource.remove()
+    //currently these aree not thread locals
+    synchronized {
+      FpSourceDataSource.set(sourceGraph)
+      FpTargetDataSource.set((targetGraphName, tcManager))
+      executeConfig(LinkingConfig.load(configStream), linkSpecID, numThreads, reload)
+      FpSourceDataSource.remove()
+      FpTargetDataSource.remove()
+    }
     FpWriter.remove()
   }
   
@@ -113,12 +116,13 @@ object Silk {
    * @param reload Specifies if the entity cache is to be reloaded before executing the matching. Default: true
    */
   private def executeLinkSpec(config: LinkingConfig, linkSpec: LinkSpecification, numThreads: Int = DefaultThreads, reload: Boolean = true) {
-    new GenerateLinksTask(
+    val links = new GenerateLinksTask(
       sources = config.sources,
       linkSpec = linkSpec,
       outputs = linkSpec.outputs ++ config.outputs,
       runtimeConfig = config.runtime.copy(numThreads = numThreads, reloadCache = reload)
-    ).apply()
+    )()
+    println("********* links"+links.length)
   }
 
 

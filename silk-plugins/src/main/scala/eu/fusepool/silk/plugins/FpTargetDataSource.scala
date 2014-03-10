@@ -37,16 +37,18 @@ case class FpTargetDataSource(val pageSize: Int = 1000) extends DataSource {
 
   private val logger = Logger.getLogger(FpTargetDataSource.getClass.getName)
 
-  private lazy val registered = FpTargetDataSource.get
-  private lazy val graphUri = registered._1
-  private lazy val tcManager = registered._2
-  private lazy val zzGraph = tcManager.getMGraph(graphUri)
-  private lazy val jenaGraph = new JenaGraph(zzGraph)
-  private lazy val model = ModelFactory.createModelForGraph(jenaGraph)
+  private def registered = FpTargetDataSource.get
+  private def graphUri = registered._1
+  private def tcManager = registered._2
+  private def zzGraph = tcManager.getMGraph(graphUri)
+  private def jenaGraph = new JenaGraph(zzGraph)
+  private def model = ModelFactory.createModelForGraph(jenaGraph)
   
-  private lazy val endpoint = new JenaSparqlEndpoint(model)
+  private def endpoint = new JenaSparqlEndpoint(model)
   
   override def retrieve(entityDesc: EntityDescription, entities: Seq[String]) = {
+    System.err.println("!!==************************* retreiving from "+registered)
+    System.err.println("Thread "+Thread.currentThread)
     zzGraph.getLock.readLock.lock()
     try {
       val entityRetriever = EntityRetriever(endpoint)
@@ -57,6 +59,7 @@ case class FpTargetDataSource(val pageSize: Int = 1000) extends DataSource {
   }
 
   override def retrievePaths(restrictions: SparqlRestriction, depth: Int, limit: Option[Int]): Traversable[(Path, Double)] = {
+    println("************************* retreiving paths from "+registered)
     zzGraph.getLock.readLock.lock()
     try {
       SparqlAggregatePathsCollector(endpoint, restrictions, limit)
@@ -69,5 +72,17 @@ case class FpTargetDataSource(val pageSize: Int = 1000) extends DataSource {
   override def toString = "fpSparqlEndpoint for "+graphUri
 }
 
-object FpTargetDataSource extends InheritableThreadLocal[(UriRef, TcManager)] {
+object FpTargetDataSource {// extends InheritableThreadLocal[(UriRef, TcManager)] {
+  type t = (UriRef, TcManager)
+  var value: t = null
+  
+  def set(p: t) = {
+    this.value = p
+  }
+  
+  def remove() = {
+    this.value = null
+  }
+  
+  def get = value
 }

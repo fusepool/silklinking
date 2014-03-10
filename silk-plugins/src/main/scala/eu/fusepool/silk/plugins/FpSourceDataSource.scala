@@ -33,11 +33,11 @@ import java.util.concurrent.locks._
 @Plugin(id = "fpSource", label = "RDF dump", description = "DataSource which retrieves all entities from a registered Clerezza graph")
 case class FpSourceDataSource() extends DataSource {
   
-  private lazy val zzGraph = FpSourceDataSource.get
-  private lazy val jenaGraph = new JenaGraph(zzGraph)
-  private lazy val model = ModelFactory.createModelForGraph(jenaGraph)
+  private def zzGraph = FpSourceDataSource.get
+  private def jenaGraph = new JenaGraph(zzGraph)
+  private def model = ModelFactory.createModelForGraph(jenaGraph)
 
-  private lazy val endpoint = new JenaSparqlEndpoint(model)
+  private def endpoint = new JenaSparqlEndpoint(model)
 
   override def retrieve(entityDesc: EntityDescription, entities: Seq[String]) = {
     val result = try {
@@ -74,5 +74,17 @@ case class FpSourceDataSource() extends DataSource {
   }
 }
 
-object FpSourceDataSource extends InheritableThreadLocal[TripleCollection] {
+object FpSourceDataSource  { //extends InheritableThreadLocal[TripleCollection] {
+  type t = TripleCollection
+  var value: t = null
+  
+  def set(p: t) = {
+    this.value = p
+  }
+  
+  def remove() = {
+    this.value = null
+  }
+  
+  def get = value
 }
