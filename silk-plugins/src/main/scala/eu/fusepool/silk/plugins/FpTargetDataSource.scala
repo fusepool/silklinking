@@ -47,8 +47,6 @@ case class FpTargetDataSource(val pageSize: Int = 1000) extends DataSource {
   private def endpoint = new JenaSparqlEndpoint(model)
   
   override def retrieve(entityDesc: EntityDescription, entities: Seq[String]) = {
-    System.err.println("!!==************************* retreiving from "+registered)
-    System.err.println("Thread "+Thread.currentThread)
     zzGraph.getLock.readLock.lock()
     try {
       val entityRetriever = EntityRetriever(endpoint)
@@ -59,7 +57,6 @@ case class FpTargetDataSource(val pageSize: Int = 1000) extends DataSource {
   }
 
   override def retrievePaths(restrictions: SparqlRestriction, depth: Int, limit: Option[Int]): Traversable[(Path, Double)] = {
-    println("************************* retreiving paths from "+registered)
     zzGraph.getLock.readLock.lock()
     try {
       SparqlAggregatePathsCollector(endpoint, restrictions, limit)
