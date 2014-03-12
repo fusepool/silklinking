@@ -58,6 +58,17 @@ public abstract class SilkInterlinker implements Interlinker {
         }
     }
     
+    public TripleCollection interlink(TripleCollection source, TripleCollection target) {
+        try {
+            TripleCollection result = getSilk().executeStream(source, target, getConfigTemplate(), null, 1, true);
+            //the output already omits self-identity and simmetric triples
+            //LinkUtils.removeInferenceableEquivalences(result);
+            return result;
+        } catch (SilkException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
     // name set in component configuration panel
     public abstract String getName();
     

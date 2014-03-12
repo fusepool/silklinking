@@ -106,6 +106,21 @@ object Silk {
     FpWriter.remove()
   }
   
+  def executeStream(sourceGraph: TripleCollection, targetGraph: TripleCollection,
+                    output: TripleCollection,configStream: InputStream, 
+                    linkSpecID: String, numThreads: Int, reload: Boolean) {
+    FpWriter.set(output)
+    //currently these aree not thread locals
+    synchronized {
+      FpSourceDataSource.set(sourceGraph)
+      FpTargetDataSource.set(targetGraph)
+      executeConfig(LinkingConfig.load(configStream), linkSpecID, numThreads, reload)
+      FpSourceDataSource.remove()
+      FpTargetDataSource.remove()
+    }
+    FpWriter.remove()
+  }
+  
   
   /**
    * Executes a single link specification.

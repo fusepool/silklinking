@@ -30,16 +30,16 @@ import java.util.concurrent.locks._
  * DataSource which retrieves all instances fom a registered Clerezza graph.
  * The Graph has to be registered with FpSourceDataSource.set
  */
-@Plugin(id = "fpSource", label = "RDF dump", description = "DataSource which retrieves all entities from a registered Clerezza graph")
-case class FpSourceDataSource() extends FpDataSource {
+trait FpDataSource extends DataSource {
   
-  def zzGraph = FpSourceDataSource.get
+  protected def zzGraph : TripleCollection
   private def jenaGraph = new JenaGraph(zzGraph)
   private def model = ModelFactory.createModelForGraph(jenaGraph)
 
   private def endpoint = new JenaSparqlEndpoint(model)
 
-  /*override def retrieve(entityDesc: EntityDescription, entities: Seq[String]) = {
+  override def retrieve(entityDesc: EntityDescription, entities: Seq[String]) = {
+    println("**************************yes!")
     val result = try {
       val lock = zzGraph match {
         case lg: LockableMGraph => lg.getLock.readLock.lock(); lg.getLock.readLock
@@ -60,6 +60,7 @@ case class FpSourceDataSource() extends FpDataSource {
   }
 
   override def retrievePaths(restrictions: SparqlRestriction, depth: Int, limit: Option[Int]): Traversable[(Path, Double)] = {
+    println("**************************yes!!!")
     val lock = zzGraph match {
       case lg: LockableMGraph => lg.getLock.readLock.lock(); lg.getLock.readLock
       case _ => null   
@@ -71,20 +72,5 @@ case class FpSourceDataSource() extends FpDataSource {
         lock.unlock()
       }
     }
-  }*/
-}
-
-object FpSourceDataSource  { //extends InheritableThreadLocal[TripleCollection] {
-  type t = TripleCollection
-  var value: t = null
-  
-  def set(p: t) = {
-    this.value = p
   }
-  
-  def remove() = {
-    this.value = null
-  }
-  
-  def get = value
 }

@@ -32,45 +32,34 @@ import java.util.concurrent.locks._
  */
 //TODO use sparql provided in TcManager
 @Plugin(id = "fpTarget", label = "Fusepool Target Data Source", description = "DataSource which retrieves all entities from a Graph registered by name")
-case class FpTargetDataSource(val pageSize: Int = 1000) extends DataSource {
+case class FpTargetDataSource() extends FpDataSource {
 
 
   private val logger = Logger.getLogger(FpTargetDataSource.getClass.getName)
 
   private def registered = FpTargetDataSource.get
-  private def graphUri = registered._1
-  private def tcManager = registered._2
-  private def zzGraph = tcManager.getMGraph(graphUri)
+  
+  def zzGraph = registered match {
+    case tuple: (UriRef, TcManager) => {
+        def graphUri = tuple._1
+        def tcManager = tuple._2
+        tcManager.getMGraph(graphUri)
+    }
+    case tc: TripleCollection => tc;
+  }
+    
+    
   private def jenaGraph = new JenaGraph(zzGraph)
   private def model = ModelFactory.createModelForGraph(jenaGraph)
   
   private def endpoint = new JenaSparqlEndpoint(model)
   
-  override def retrieve(entityDesc: EntityDescription, entities: Seq[String]) = {
-    zzGraph.getLock.readLock.lock()
-    try {
-      val entityRetriever = EntityRetriever(endpoint)
-      entityRetriever.retrieve(entityDesc, entities)
-    } finally {
-      zzGraph.getLock.readLock.unlock()
-    }
-  }
 
-  override def retrievePaths(restrictions: SparqlRestriction, depth: Int, limit: Option[Int]): Traversable[(Path, Double)] = {
-    zzGraph.getLock.readLock.lock()
-    try {
-      SparqlAggregatePathsCollector(endpoint, restrictions, limit)
-    } finally {
-      zzGraph.getLock.readLock.unlock()
-    }
-  }
-
-
-  override def toString = "fpSparqlEndpoint for "+graphUri
+  override def toString = "FpTargetDataSource"
 }
 
 object FpTargetDataSource {// extends InheritableThreadLocal[(UriRef, TcManager)] {
-  type t = (UriRef, TcManager)
+  type t = Object //actulally (UriRef, TcManager) or TripleCollection
   var value: t = null
   
   def set(p: t) = {

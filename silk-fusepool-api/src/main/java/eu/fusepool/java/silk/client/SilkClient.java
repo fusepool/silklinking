@@ -42,6 +42,10 @@ public interface SilkClient {
      */
     TripleCollection executeStream(TripleCollection sourceGraph, UriRef targetGraphName, 
             InputStream config, String linkSpecId, int numThreads, boolean reload) throws SilkException;
+    
+    TripleCollection executeStream(TripleCollection sourceGraph, TripleCollection targetGraph, 
+            InputStream config, String linkSpecId, int numThreads, boolean reload) throws SilkException;
+
 
 
 
