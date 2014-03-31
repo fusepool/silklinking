@@ -13,7 +13,7 @@
 		<DataSource id="source" type="fpSource">
 		</DataSource>
 		
-		<DataSource id="master" type="fpTarget">
+		<DataSource id="target" type="fpTarget">
 		</DataSource>
 	</DataSources>
 
