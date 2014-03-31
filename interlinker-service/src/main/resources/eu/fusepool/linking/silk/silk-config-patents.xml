@@ -12,7 +12,7 @@
 		<DataSource id="source" type="fpSource">
 		</DataSource>
 		
-		<DataSource id="master" type="fpTarget">
+		<DataSource id="target" type="fpTarget">
 		</DataSource>
 	</DataSources>
 
@@ -35,7 +35,7 @@
 				}				
 				</RestrictTo>
 			</SourceDataset>
-			<TargetDataset dataSource="master" var="agent_b">
+			<TargetDataset dataSource="target" var="agent_b">
 				<RestrictTo>				 
  				{
  				?patent rdf:type pmo:PatentPublication .
