@@ -7,55 +7,113 @@
 		<Prefix namespace="http://purl.org/ontology/bibo/" id="bibo"></Prefix>
 		<Prefix namespace="http://purl.org/dc/terms/" id="dcterms"></Prefix>
 		<Prefix namespace="http://fise.iks-project.eu/ontology/" id="fise"></Prefix>
+        <Prefix namespace="http://schema.org/" id="schema"></Prefix>
 	</Prefixes>
 	<DataSources>
 		<DataSource id="source" type="fpSource">
 		</DataSource>
 		
-		<DataSource id="master" type="fpTarget">
+		<DataSource id="target" type="fpTarget">
 		</DataSource>
 	</DataSources>
 
-	<Blocking blocks="100" enabled="true" />
+	<Blocking blocks="100" />
 
 	<Interlinks>
-		<Interlink id="contributors">
+		<Interlink id="affiliations">
 			<LinkType>owl:sameAs</LinkType>
-			<SourceDataset dataSource="source" var="contributor_a">
+			<SourceDataset dataSource="source" var="organization_a">
 				<RestrictTo> 
-                                 ?publication dcterms:contributor ?contributor_a .
-                                 ?contributor_a foaf:firstName ?contrib_name .
-	                         ?contributor_a foaf:lastName ?contrib_lastname .
+                        ?contributor schema:affiliation ?organization_a .
+                        ?organization_a foaf:name ?name . 
 				</RestrictTo>
 			</SourceDataset>
-			<TargetDataset dataSource="master" var="contributor_b">
+			<TargetDataset dataSource="target" var="organization_b">
 				<RestrictTo>  
-                                 ?publication dcterms:contributor ?contributor_b .
-                                 ?contributor_b foaf:firstName ?contrib_name .
-	                         ?contributor_b foaf:lastName ?contrib_lastname .
+                        ?contributor schema:affiliation ?organization_b .
+                        ?organization_b foaf:name ?name .
 				</RestrictTo>
 			</TargetDataset>
 			<LinkageRule>
-                                <Aggregate type="average">
-					<Compare metric="jaroWinkler" threshold="0.90">
-						<Input path="?contributor_a/foaf:firstName"></Input>
-						<Input path="?contributor_b/foaf:firstName"></Input>
-					</Compare>
-                                	<Compare metric="jaroWinkler" threshold="0.90">
-                                        	<Input path="?contributor_a/foaf:lastName"></Input>
-                                        	<Input path="?contributor_b/foaf:lastName"></Input>
-                                	</Compare>
-                                </Aggregate>
+				<Compare metric="jaroWinkler" threshold="0.95">                                        
+					<Input path="?organization_a/foaf:name"></Input>                                       
+					<Input path="?organization_b/foaf:name"></Input>
+				</Compare>
 			</LinkageRule>
-
-			<Filter threshold="0.90"></Filter>
-
+            <Filter threshold="0.95"></Filter>
 			<Outputs>
 			 
-				<Output type="fpWriter" minConfidence="0.95">
-				</Output>
-                               
+				<Output type="file" minConfidence="0.995">
+					        <Param name="file"
+						      value="[ACCEPT_LINKS_FILE_PATH]" />
+					        <Param name="format" value="ntriples" />
+				      </Output>
+			
 			</Outputs>
+		</Interlink>
+		
+		<Interlink id="contributors">
+					<LinkType>owl:sameAs</LinkType>
+					<SourceDataset dataSource="source" var="contributor_a">
+						<RestrictTo> 
+		                    ?publication dcterms:contributor ?contributor_a .
+		                    ?contributor_a foaf:firstName ?contrib_name .
+			                ?contributor_a foaf:lastName ?contrib_lastname .
+						</RestrictTo>
+					</SourceDataset>
+					<TargetDataset dataSource="target" var="contributor_b">
+						<RestrictTo>  
+		                    ?publication dcterms:contributor ?contributor_b .
+		                    ?contributor_b foaf:firstName ?contrib_name .
+			                ?contributor_b foaf:lastName ?contrib_lastname .
+						</RestrictTo>
+					</TargetDataset>
+					<LinkageRule>
+		                    <Aggregate type="average">
+							<Compare metric="jaroWinkler" threshold="0.95">
+								<Input path="?contributor_a/foaf:firstName"></Input>
+								<Input path="?contributor_b/foaf:firstName"></Input>
+							</Compare>
+		                    <Compare metric="jaroWinkler" >
+		                       <Input path="?contributor_a/foaf:lastName"></Input>
+		                       <Input path="?contributor_b/foaf:lastName"></Input>
+		                    </Compare>
+		                    </Aggregate>
+					</LinkageRule>
+				        <Filter threshold="0.95"></Filter>
+					<Outputs>
+					 
+						<Output type="fpWriter" minConfidence="0.95">
+                                                </Output>
+					</Outputs>
+		</Interlink>
+		
+		<Interlink id="publishers">
+					<LinkType>owl:sameAs</LinkType>
+					<SourceDataset dataSource="source" var="publisher_a">
+						<RestrictTo> 
+						    ?journal dcterms:publisher ?publisher_a .
+		                    ?publisher_a rdf:type foaf:Agent .
+		                    ?publisher_a foaf:name ?name .
+						</RestrictTo>
+					</SourceDataset>
+					<TargetDataset dataSource="target" var="publisher_b">
+						<RestrictTo>
+						    ?journal dcterms:publisher ?publisher_a .  
+		                    ?publisher_b rdf:type foaf:Agent .
+		                    ?publisher_b foaf:name ?name .
+						</RestrictTo>
+					</TargetDataset>
+					<LinkageRule>		              
+							<Compare metric="jaroWinkler" threshold="0.95">
+								<Input path="?publisher_a/foaf:name"></Input>
+								<Input path="?publisher_b/foaf:name"></Input>								
+							</Compare>		                    
+					</LinkageRule>
+				    <Filter threshold="0.95"></Filter>
+					<Outputs> 
+						<Output type="fpWriter" minConfidence="0.995"></Output>
+					</Outputs>
 		</Interlink>
 		
 	</Interlinks>
