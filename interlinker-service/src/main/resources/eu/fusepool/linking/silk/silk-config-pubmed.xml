@@ -99,7 +99,7 @@
 					</SourceDataset>
 					<TargetDataset dataSource="target" var="publisher_b">
 						<RestrictTo>
-						    ?journal dcterms:publisher ?publisher_a .  
+						    ?journal dcterms:publisher ?publisher_b .  
 		                    ?publisher_b rdf:type foaf:Agent .
 		                    ?publisher_b foaf:name ?name .
 						</RestrictTo>
