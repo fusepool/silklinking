@@ -20,7 +20,7 @@
             <name>Giorgio Costa</name>
         </developer>
         <developer>
-            <name>Reto Gmür</name>
+            <name>Reto GmÃ¼r</name>
         </developer>
     </developers>
 
@@ -59,13 +59,11 @@
             <dependency>
                 <groupId>org.osgi</groupId>
                 <artifactId>org.osgi.core</artifactId>
-                <version>4.1.0</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.osgi</groupId>
                 <artifactId>org.osgi.compendium</artifactId>
-                <version>4.1.0</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
