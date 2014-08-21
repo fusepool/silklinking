@@ -5,10 +5,8 @@ package eu.fusepool.java.silk.client.impl;
 
 import java.io.InputStream;
 
-import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
-import org.osgi.service.component.ComponentContext;
 
 import eu.fusepool.java.silk.client.SilkClient;
 import eu.fusepool.java.silk.client.SilkException;
